@@ -1,0 +1,17 @@
+{
+  "name": "disinfoagent",
+  "version": "0.0.1",
+  "description": "Main project pipeline for identifying trigger events",
+  "license": "GPL-3.0",
+  "author": "Will Jeynes",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "@langchain/core": "^1.1.17",
+    "@langchain/langgraph": "^1.1.2",
+    "langchain": "^1.2.14"
+  }
+}
