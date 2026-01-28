@@ -8,9 +8,9 @@ const streamResponse = client.runs.stream(
   thread["thread_id"],
   "agent", 
   {
-    input: [
-      { role: "user", content: "3+5" }
-    ],
+    input: {
+      "messages": ["3+5" ]
+    },
     streamMode: "messages-tuple",
   }
 );
