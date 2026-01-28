@@ -37,4 +37,4 @@ export const arithmeticToolsByName = {
   [divide.name]: divide,
 };
 
-export const arithmeticTools = Object.values(arithmeticToolsByName);
+//const arithmeticTools = Object.values(arithmeticToolsByName);

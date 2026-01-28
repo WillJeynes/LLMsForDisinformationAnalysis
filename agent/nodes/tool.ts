@@ -1,25 +1,26 @@
 import { AIMessage, ToolMessage } from "@langchain/core/messages";
 import { GraphNode } from "@langchain/langgraph";
 import { MessagesState } from "../state";
-import { arithmeticToolsByName } from "../tools/arithmetic";
 
-export const toolNode: GraphNode<typeof MessagesState> = async (state) => {
-  const lastMessage = state.messages.at(-1);
+export function createToolNode(tools): GraphNode<typeof MessagesState> {
+  return async (state) => {
+    const lastMessage = state.messages.at(-1);
 
-  //STARTTEMP
-  return {messages: [new AIMessage("yeman")]}
-  //ENDTEMP
-  
-  if (lastMessage == null || !AIMessage.isInstance(lastMessage)) {
-    return { messages: [] };
-  }
+    //STARTTEMP
+    return {messages: [new AIMessage("yeman")]}
+    //ENDTEMP
 
-  const result: ToolMessage[] = [];
-  for (const toolCall of lastMessage.tool_calls ?? []) {
-    const tool = arithmeticToolsByName[toolCall.name];
-    const observation = await tool.invoke(toolCall);
-    result.push(observation);
-  }
+    if (lastMessage == null || !AIMessage.isInstance(lastMessage)) {
+      return { messages: [] };
+    }
 
-  return { messages: result };
-};
+    const result: ToolMessage[] = [];
+    for (const toolCall of (lastMessage as AIMessage).tool_calls ?? []) {
+      const tool = tools[toolCall.name];
+      const observation = await tool.invoke(toolCall);
+      result.push(observation);
+    }
+
+    return { messages: result };
+  };
+}
