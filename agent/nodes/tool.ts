@@ -2,7 +2,7 @@ import { AIMessage, ToolMessage } from "@langchain/core/messages";
 import { GraphNode } from "@langchain/langgraph";
 import { MessagesState } from "../state";
 
-export function createToolNode(tools): GraphNode<typeof MessagesState> {
+export function createToolNode(tools: any): GraphNode<typeof MessagesState> {
   return async (state) => {
     const lastMessage = state.messages.at(-1);
 
