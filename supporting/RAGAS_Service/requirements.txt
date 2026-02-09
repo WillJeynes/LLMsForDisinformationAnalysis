@@ -1,0 +1,19 @@
+# Web API
+fastapi
+uvicorn[standard]
+
+# RAGAS
+ragas
+datasets
+
+# LLM + embeddings
+openai
+tiktoken
+
+# Utils
+pydantic
+numpy
+pandas
+
+# Environment
+python-dotenv
