@@ -20,10 +20,12 @@
     "dotenv": "^17.2.3",
     "fs": "^0.0.1-security",
     "langchain": "^1.2.14",
+    "selenium-webdriver": "^4.40.0",
     "winston": "^3.19.0"
   },
   "devDependencies": {
     "@types/node": "^25.1.0",
+    "@types/selenium-webdriver": "^4.35.5",
     "tsx": "^4.21.0"
   }
 }

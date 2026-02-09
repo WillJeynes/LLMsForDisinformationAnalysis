@@ -8,13 +8,15 @@ import { createDummyModelNode } from "./nodes/dummyModel";
 import { verificationSetup } from "./nodes/verificationSetup";
 import { dummyRagasMetrics } from "./nodes/dummyRagasMetrics";
 import { produceRanking } from "./nodes/produceRanking";
+import { createModelNode } from "./nodes/model";
 
 const triggerEventToolNode = createToolNode(arithmeticToolsByName);
 const verificationToolNode = createToolNode(arithmeticToolsByName);
 
 const dummyTriggerEventModel = createDummyModelNode("Trigger Events of");
-const dummyNormalisationModel = createDummyModelNode("Normalised");
 const dummyVerificationModel = createDummyModelNode("verification of");
+
+const normalisationModel = createModelNode([], "normalization.txt");
 
 const triggerEventToolConditional = createToolConditional("triggerEventToolNode", verificationSetup.name);
 const verificationToolConditional = createToolConditional("verificationToolNode", produceRanking.name);
@@ -25,7 +27,7 @@ const agent = new StateGraph(MessagesState)
   //NODES
   
   .addNode(normalizationSetup.name, normalizationSetup)
-  .addNode("dummyNormalisationModel", dummyNormalisationModel)
+  .addNode("normalisationModel", normalisationModel)
   
   .addNode("triggerEventToolNode", triggerEventToolNode)
   .addNode("dummyTriggerEventModel", dummyTriggerEventModel)
@@ -37,8 +39,8 @@ const agent = new StateGraph(MessagesState)
   .addNode(produceRanking.name, produceRanking)
   
   .addEdge(START, normalizationSetup.name)
-  .addEdge(normalizationSetup.name, "dummyNormalisationModel")
-  .addEdge("dummyNormalisationModel", "dummyTriggerEventModel")
+  .addEdge(normalizationSetup.name, "normalisationModel")
+  .addEdge("normalisationModel", "dummyTriggerEventModel")
   
   // @ts-expect-error
   .addConditionalEdges("dummyTriggerEventModel", triggerEventToolConditional, ["triggerEventToolNode", verificationSetup.name])
