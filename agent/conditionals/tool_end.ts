@@ -6,12 +6,6 @@ export function createToolConditional(a: String, b: String): ConditionalEdgeRout
   // @ts-expect-error
   var genericToolConditional: ConditionalEdgeRouter<typeof MessagesState, String> = (state) => {
     const lastMessage = state.messages.at(-1);
-    
-    //STARTTEMP
-    if (lastMessage?.content?.toString().indexOf("qwe") != -1) {
-      return a
-    }
-    //ENDTEMP
 
     // Check if it's an AIMessage before accessing tool_calls
     if (!lastMessage || !AIMessage.isInstance(lastMessage)) {

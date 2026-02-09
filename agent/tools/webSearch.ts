@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export async function queryScraper(query: string) {
+export async function queryScraper(query: string): Promise<string[]> {
     const instance = process.env.SCRAPER_INSTANCE;
     if (!instance) {
         throw new Error("SCRAPER_INSTANCE environment variable is not set");
@@ -10,8 +10,8 @@ export async function queryScraper(query: string) {
 
     const url = `${instance}/api/v1/web`;
 
-    const params : Record<string, string> = Object.entries(process.env)
-        .filter(([key, value]) => key.startsWith("SCRAPER_PARAM_") && value !== undefined) 
+    const params: Record<string, string> = Object.entries(process.env)
+        .filter(([key, value]) => key.startsWith("SCRAPER_PARAM_") && value !== undefined)
         .reduce((acc: Record<string, string>, [key, value]) => {
             const paramName = key.replace(/^SCRAPER_PARAM_/, "").toLowerCase();
             acc[paramName] = value!;
@@ -35,12 +35,23 @@ export async function queryScraper(query: string) {
 
     const data = response.data;
 
-    // Basic validation
     if (data?.status !== "ok") {
         throw new Error(`API returned status: ${data?.status}`);
     }
 
-    return data;
+    // TEMP?: Convert API results to array of formatted strings.
+
+    const context = data.web ?? [];
+
+    const lines: string[] = context.map((item: any) => {
+        const title = (item.title ?? "").trim();
+        const desc = (item.description ?? "").trim();
+        const link = (item.url ?? "").trim();
+
+        return `- ${title}\n  ${desc}\n  ${link}`;
+    });
+
+    return lines;
 }
 
 

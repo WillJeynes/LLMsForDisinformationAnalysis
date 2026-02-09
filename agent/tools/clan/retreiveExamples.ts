@@ -3,6 +3,7 @@ import fs from "fs";
 import { pipeline, cos_sim } from "@huggingface/transformers";
 import { logger } from "../../utils/logger";
 
+//TODO, am getting duplicates, is it from the multi files?
 const CSV_PATHS = [
   "./tools/clan/dev-eng.csv",
   // "./tools/clan/test-eng.csv",

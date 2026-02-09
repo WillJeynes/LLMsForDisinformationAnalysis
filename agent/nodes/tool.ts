@@ -6,10 +6,6 @@ export function createToolNode(tools: any): GraphNode<typeof MessagesState> {
   return async (state) => {
     const lastMessage = state.messages.at(-1);
 
-    //STARTTEMP
-    return {messages: [new AIMessage("yeman")]}
-    //ENDTEMP
-
     if (lastMessage == null || !AIMessage.isInstance(lastMessage)) {
       return { messages: [] };
     }

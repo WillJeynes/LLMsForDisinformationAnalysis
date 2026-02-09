@@ -6,12 +6,12 @@ import { hydratePrompt } from "../prompts/hydratePrompt";
 
 export function createModelNode(tools: any, promptPath: string): GraphNode<typeof MessagesState> {
     return async (state) => {
-        const sysPrompt = hydratePrompt(promptPath, state.disinformationTitle)
+        const sysPrompt = hydratePrompt(promptPath, state);
 
         const model = new ChatOpenAI({
             model: "gpt-5-mini"
         });
-        const modelWithTools = model.bindTools(tools);
+        const modelWithTools = model.bindTools(Object.values(tools));
 
         const response = await modelWithTools.invoke([
             new SystemMessage(

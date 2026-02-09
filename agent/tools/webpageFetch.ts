@@ -1,7 +1,7 @@
 import { Builder, Browser } from "selenium-webdriver";
 import firefox from "selenium-webdriver/firefox";
 
-async function extractWebpageContent(url: string) : Promise<string>{
+export async function extractWebpageContent(url: string) : Promise<string[]>{
     const options = new firefox.Options();
     options.addArguments("--headless");
 
@@ -18,7 +18,12 @@ async function extractWebpageContent(url: string) : Promise<string>{
             "return document.body.innerText;"
         ) as string;
 
-        return readableText
+        const filteredLines = readableText
+            .split(/\r?\n/)
+            .map(line => line.trim())
+            .filter(line => line.split(/\s+/).length > 1); 
+        
+        return filteredLines;
     } finally {
         await driver.quit()
     }

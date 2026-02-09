@@ -14,6 +14,6 @@ DISINFORMATION CLAIM: something is NOT true BECOMES something is true
 Relevent examples are included in preceeding messages, use these as exact inspiration.
 
 The claim to normalize is:
-###
+###TITLE###
 
 Produce no other text other than the condensed claim.
