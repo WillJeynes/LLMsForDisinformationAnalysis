@@ -44,8 +44,8 @@ def evaluate_rag(req: EvalRequest):
         dataset,
         metrics=[
             faithfulness, 
-            answer_relevancy, 
-            context_precision
+          #  answer_relevancy, 
+          #  context_precision
         ],
     )
 

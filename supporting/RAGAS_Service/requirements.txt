@@ -6,12 +6,7 @@ uvicorn[standard]
 ragas
 datasets
 
-# LLM + embeddings
-openai
-tiktoken
-
 # Utils
-pydantic
 numpy
 pandas
 
