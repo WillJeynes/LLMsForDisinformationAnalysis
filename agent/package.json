@@ -5,9 +5,10 @@
   "license": "GPL-3.0",
   "author": "Will Jeynes",
   "type": "module",
-  "main": "index.ts",
+  "main": "agent.ts",
   "scripts": {
-    "dev": "tsx run.ts"
+    "agent": "npx @langchain/langgraph-cli dev",
+    "ragas_service": "cd ../supporting/RAGAS_Service && .venv/bin/uvicorn ragas_service:app --port 8001"
   },
   "dependencies": {
     "@huggingface/transformers": "^3.8.1",
