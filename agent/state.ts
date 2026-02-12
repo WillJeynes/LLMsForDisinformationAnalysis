@@ -1,12 +1,6 @@
 import {
-  StateGraph,
   StateSchema,
   MessagesValue,
-  ReducedValue,
-  GraphNode,
-  ConditionalEdgeRouter,
-  START,
-  END,
 } from "@langchain/langgraph";
 import { z } from "zod/v4";
 
@@ -17,7 +11,7 @@ export const ProposedTriggerEvent = z.object({
   Url: z.url(),
   IsItselfDisinformation: z.boolean(),
   context: z.string().optional(),
-  score: z.number().optional
+  score: z.number().optional()
 })
 
 export const ProposedTriggerEventArray = z.array(ProposedTriggerEvent);

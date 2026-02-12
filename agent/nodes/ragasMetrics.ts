@@ -8,8 +8,6 @@ export const ragasMetrics: GraphNode<typeof MessagesState> = async (state) => {
   const answer = state.proposedTriggerEvent[state.proposedTriggerEventIndex].Event
   const contexts = state.proposedTriggerEvent[state.proposedTriggerEventIndex].context?.split("^^^") ?? []
   
-  console.log(contexts)
-  
   const results = await evaluateWithRagas({question, answer, contexts})
   
   return {

@@ -7,7 +7,7 @@ export const loopEndConditional: ConditionalEdgeRouter<typeof MessagesState, Str
     const triggerEventsIndex = state.proposedTriggerEventIndex;
 
     if (triggerEventsIndex == triggerEvents.length-1) {
-      return END
+      return "sort"
     }
     else {
       return "verificationSetup"

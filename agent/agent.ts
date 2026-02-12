@@ -9,6 +9,7 @@ import { ragasMetrics } from "./nodes/ragasMetrics";
 import { produceRanking } from "./nodes/produceRanking";
 import { createModelNode } from "./nodes/model";
 import { loopEndConditional } from "./conditionals/loop_end";
+import { sort } from "./nodes/sort";
 
 const triggerEventToolNode = createToolNode(triggerEventToolsByName);
 
@@ -34,6 +35,7 @@ const agent = new StateGraph(MessagesState)
   .addNode("relationModel", relationModel)
   
   .addNode(produceRanking.name, produceRanking)
+  .addNode(sort.name, sort)
   
   .addEdge(START, normalizationSetup.name)
   .addEdge(normalizationSetup.name, "normalisationModel")
@@ -52,8 +54,10 @@ const agent = new StateGraph(MessagesState)
   .addEdge("relationModel", produceRanking.name)
 
   // @ts-expect-error
-  .addConditionalEdges(produceRanking.name, loopEndConditional, [verificationSetup.name, END])
+  .addConditionalEdges(produceRanking.name, loopEndConditional, [verificationSetup.name, sort.name])
   
+  .addEdge(sort.name, END)
+
   .compile();
 
   export {agent}
