@@ -15,13 +15,13 @@ const triggerEventToolNode = createToolNode(triggerEventToolsByName);
 const normalisationModel = createModelNode([], "normalization.txt");
 const triggerEventModel = createModelNode(triggerEventToolsByName, "trigger.txt");
 const verificationModel = createModelNode([], "verify.txt");
+const relationModel = createModelNode([], "relation.txt");
 
 const triggerEventToolConditional = createToolConditional("triggerEventToolNode", verificationSetup.name);
 
 const agent = new StateGraph(MessagesState)
   
   //NODES
-  
   .addNode(normalizationSetup.name, normalizationSetup)
   .addNode("normalisationModel", normalisationModel)
   
@@ -31,6 +31,8 @@ const agent = new StateGraph(MessagesState)
   .addNode(verificationSetup.name, verificationSetup)
   .addNode("verificationModel", verificationModel)
   .addNode(ragasMetrics.name, ragasMetrics)
+  .addNode("relationModel", relationModel)
+  
   .addNode(produceRanking.name, produceRanking)
   
   .addEdge(START, normalizationSetup.name)
@@ -43,9 +45,11 @@ const agent = new StateGraph(MessagesState)
   
   .addEdge(verificationSetup.name, "verificationModel")
   .addEdge(verificationSetup.name, ragasMetrics.name)
+  .addEdge(verificationSetup.name, "relationModel")
 
   .addEdge(ragasMetrics.name, produceRanking.name)
   .addEdge("verificationModel", produceRanking.name)
+  .addEdge("relationModel", produceRanking.name)
 
   // @ts-expect-error
   .addConditionalEdges(produceRanking.name, loopEndConditional, [verificationSetup.name, END])

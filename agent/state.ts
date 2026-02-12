@@ -16,7 +16,8 @@ export const ProposedTriggerEvent = z.object({
   SearchQuery: z.string(),
   Url: z.url(),
   IsItselfDisinformation: z.boolean(),
-  context: z.string().optional()
+  context: z.string().optional(),
+  score: z.number().optional
 })
 
 export const ProposedTriggerEventArray = z.array(ProposedTriggerEvent);

@@ -1,0 +1,9 @@
+Could the following real-world event:
+###TECLAIM###
+
+Be a trigger for the following disinformation:
+###TITLE###
+
+Respond with "RELATION", followed by : followed by a confidence score (VERYHIGH, HIGH, MEDIUM, LOW, VERYLOW) followed by : followed by the reason. Use no other words, just return the score and reason in format.
+
+Ignore wether the event happened or not, purely consider the likiness of causation
