@@ -4,9 +4,8 @@ import { createToolNode } from "./nodes/tool";
 import { createToolConditional } from "./conditionals/tool_end";
 import { normalizationSetup } from "./nodes/normalizationSetup";
 import { triggerEventToolsByName } from "./tools/triggerEventTools"
-import { createDummyModelNode } from "./nodes/dummyModel";
 import { verificationSetup } from "./nodes/verificationSetup";
-import { dummyRagasMetrics } from "./nodes/dummyRagasMetrics";
+import { ragasMetrics } from "./nodes/ragasMetrics";
 import { produceRanking } from "./nodes/produceRanking";
 import { createModelNode } from "./nodes/model";
 import { loopEndConditional } from "./conditionals/loop_end";
@@ -31,7 +30,7 @@ const agent = new StateGraph(MessagesState)
 
   .addNode(verificationSetup.name, verificationSetup)
   .addNode("verificationModel", verificationModel)
-  .addNode(dummyRagasMetrics.name, dummyRagasMetrics)
+  .addNode(ragasMetrics.name, ragasMetrics)
   .addNode(produceRanking.name, produceRanking)
   
   .addEdge(START, normalizationSetup.name)
@@ -43,9 +42,9 @@ const agent = new StateGraph(MessagesState)
   .addEdge("triggerEventToolNode", "triggerEventModel")
   
   .addEdge(verificationSetup.name, "verificationModel")
-  .addEdge(verificationSetup.name, dummyRagasMetrics.name)
+  .addEdge(verificationSetup.name, ragasMetrics.name)
 
-  .addEdge(dummyRagasMetrics.name, produceRanking.name)
+  .addEdge(ragasMetrics.name, produceRanking.name)
   .addEdge("verificationModel", produceRanking.name)
 
   // @ts-expect-error

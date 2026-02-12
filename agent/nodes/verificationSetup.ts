@@ -6,8 +6,7 @@ import { rankAndDisplayData } from "../tools/triggerEventTools";
 
 export const verificationSetup: GraphNode<typeof MessagesState> = async (state) => {
   //this is kinda doing two things, but having two nodes for it seems overkill
-  console.log(state.proposedTriggerEvent)
-  console.log(state.proposedTriggerEventIndex)
+
   if (state.proposedTriggerEvent == undefined) {
     logger.warn("No trigger events in memory, parsing")
 

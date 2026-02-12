@@ -48,7 +48,7 @@ export async function queryScraper(query: string): Promise<string[]> {
         const desc = (item.description ?? "").trim();
         const link = (item.url ?? "").trim();
 
-        return `- ${title}\n  ${desc}\n  ${link}`;
+        return `^^^ ${title}\n  ${desc}\n  ${link}`;
     });
 
     return lines;
