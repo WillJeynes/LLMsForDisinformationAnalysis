@@ -15,7 +15,8 @@ export const ProposedTriggerEvent = z.object({
   ReasoningWhyRelevant: z.string(),
   SearchQuery: z.string(),
   Url: z.url(),
-  IsItselfDisinformation: z.boolean()
+  IsItselfDisinformation: z.boolean(),
+  context: z.string().optional()
 })
 
 export const ProposedTriggerEventArray = z.array(ProposedTriggerEvent);

@@ -1,0 +1,8 @@
+Do the search results cited below
+###TESEARCH###
+Support the idea that the following happened:
+###TECLAIM###
+
+Respond with "CONFIDENCE", followed by : followed by a confidence score (VERYHIGH, HIGH, MEDIUM, LOW, VERYLOW) followed by : followed by the reason. Use no other words, just return the score and reason in format.
+
+Dates can be off by a few days, that would still be valid

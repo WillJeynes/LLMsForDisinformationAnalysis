@@ -5,7 +5,7 @@ import { extractWebpageContent } from "./webpageFetch";
 import { rankDynamically } from "./clan/retreiveExamples";
 
 
-async function rankAndDisplayData(data: string[], context: string):Promise<string> {
+export async function rankAndDisplayData(data: string[], context: string):Promise<string> {
   let index = 0;
   let ranked = await rankDynamically(context, data.map(irm => ({ id: index++, rawtext: irm })))
   return ranked.map(itm => itm.rawtext).join("\n")
