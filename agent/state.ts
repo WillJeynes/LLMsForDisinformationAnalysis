@@ -10,8 +10,20 @@ import {
 } from "@langchain/langgraph";
 import { z } from "zod/v4";
 
+export const ProposedTriggerEvent = z.object({
+  Event: z.string(),
+  ReasoningWhyRelevant: z.string(),
+  SearchQuery: z.string(),
+  Url: z.url(),
+  IsItselfDisinformation: z.boolean()
+})
+
+export const ProposedTriggerEventArray = z.array(ProposedTriggerEvent);
+
 export const MessagesState = new StateSchema({
+  disinformationTitle: z.string(),
   messages: MessagesValue,
-  // normalizationContext: z.map(z.string(), z.string()),
-  disinformationTitle: z.string()
+  proposedTriggerEvent: ProposedTriggerEventArray,
+  proposedTriggerEventIndex: z.int(),
 });
+

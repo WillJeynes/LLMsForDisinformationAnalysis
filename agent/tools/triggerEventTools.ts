@@ -2,18 +2,20 @@ import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 import { queryScraper } from "./webSearch";
 import { extractWebpageContent } from "./webpageFetch";
+import { rankDynamically } from "./clan/retreiveExamples";
 
 
-function rankAndDisplayData(data: string[]):string {
-  //TODO: hybrid re-ranking of the provided data
-  return data.join("\n")
+async function rankAndDisplayData(data: string[], context: string):Promise<string> {
+  let index = 0;
+  let ranked = await rankDynamically(context, data.map(irm => ({ id: index++, rawtext: irm })))
+  return ranked.map(itm => itm.rawtext).join("\n")
 }
 
 // Define tools
 const webSearch = tool(
   async ({ a }) => {
     const data = await queryScraper(a);
-    return rankAndDisplayData(data);
+    return await rankAndDisplayData(data, a);
   },
   {
     name: "WebSearch",
@@ -25,15 +27,16 @@ const webSearch = tool(
 );
 
 const openWebpage = tool(
-  async ({ a }) => {
+  async ({ a, b }) => {
     const data = await extractWebpageContent(a);
-    return rankAndDisplayData(data);
+    return rankAndDisplayData(data, b);
   },
   {
     name: "OpenWebpage",
     description: "Opens webpage and returns most relevent snippets",
     schema: z.object({
       a: z.string().describe("URL"),
+      b: z.string().describe("What to match against in webpage content"),
     }),
   }
 );

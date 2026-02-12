@@ -9,9 +9,9 @@ import { verificationSetup } from "./nodes/verificationSetup";
 import { dummyRagasMetrics } from "./nodes/dummyRagasMetrics";
 import { produceRanking } from "./nodes/produceRanking";
 import { createModelNode } from "./nodes/model";
+import { loopEndConditional } from "./conditionals/loop_end";
 
 const triggerEventToolNode = createToolNode(triggerEventToolsByName);
-const verificationToolNode = createToolNode([]);
 
 const dummyVerificationModel = createDummyModelNode("verification of");
 
@@ -20,8 +20,6 @@ const triggerEventModel = createModelNode(triggerEventToolsByName, "trigger.txt"
 
 
 const triggerEventToolConditional = createToolConditional("triggerEventToolNode", verificationSetup.name);
-const verificationToolConditional = createToolConditional("verificationToolNode", produceRanking.name);
-
 
 const agent = new StateGraph(MessagesState)
   
@@ -36,7 +34,6 @@ const agent = new StateGraph(MessagesState)
   .addNode(verificationSetup.name, verificationSetup)
   .addNode("dummyVerificationModel", dummyVerificationModel)
   .addNode(dummyRagasMetrics.name, dummyRagasMetrics)
-  .addNode("verificationToolNode", verificationToolNode)
   .addNode(produceRanking.name, produceRanking)
   
   .addEdge(START, normalizationSetup.name)
@@ -50,12 +47,12 @@ const agent = new StateGraph(MessagesState)
   .addEdge(verificationSetup.name, "dummyVerificationModel")
   .addEdge(verificationSetup.name, dummyRagasMetrics.name)
 
-  // @ts-expect-error
-  .addConditionalEdges("dummyVerificationModel", verificationToolConditional, ["verificationToolNode", produceRanking.name])
-  .addEdge("verificationToolNode", "dummyVerificationModel")
-  
   .addEdge(dummyRagasMetrics.name, produceRanking.name)
+  .addEdge("dummyVerificationModel", produceRanking.name)
 
+  
+  .addConditionalEdges(produceRanking.name, loopEndConditional, [verificationSetup.name, END])
+  
   .compile();
 
   export {agent}
