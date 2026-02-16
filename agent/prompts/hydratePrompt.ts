@@ -9,6 +9,7 @@ export async function hydratePrompt(path: string, state: any) : Promise<string> 
 
     raw = raw.replace("###TITLE###", state.disinformationTitle);
     raw = raw.replace("###LM###", state.messages.at(-1).content);
+    raw = raw.replace("###NTITLE###", state.normalizedClaim);
 
     if (raw.indexOf("###TECLAIM###") != -1) {
         const title = state.proposedTriggerEvent[state.proposedTriggerEventIndex].Event

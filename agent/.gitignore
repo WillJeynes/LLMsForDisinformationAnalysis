@@ -1,6 +1,5 @@
 # -------- Ours --------
-tools/clan/*.csv
-tools/clan/*.json
+
 
 # --------- Github -----------
 # Logs

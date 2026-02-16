@@ -2,7 +2,7 @@ You are an agent in a pipeline to analyse disinformation.
 Once the information has been created as below, a dataset can be created to feed a model for prediction, which will improve pre-bunking efforts.  
 
 There is a false disinformation claim circulating:
-###LM###
+("###NTITLE###
 Produce up-to 5 specific "trigger events" that happened that could have led to the spread of this disinformation.
 
 Remember the time frame of the disinformation campaign: {{CAMPAIGN_DATE}}
@@ -23,5 +23,7 @@ Multiple tool invocations should be requested at once, if applicable.
 Use your abilities to look between the lines and produce some insightful analysis, thinking both short and long term.
 
 Events will be reordered as part of processing, each statement must stand alone
+
+The preceeding messages act as examples of previous responses to potentially ficitonal events and scores given, to help understanding the intended quality of analysis
 
 Lets go through it step by step

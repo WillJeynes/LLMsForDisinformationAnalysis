@@ -21,5 +21,6 @@ export const MessagesState = new StateSchema({
   messages: MessagesValue,
   proposedTriggerEvent: ProposedTriggerEventArray,
   proposedTriggerEventIndex: z.int(),
+  normalizedClaim: z.string(),
 });
 

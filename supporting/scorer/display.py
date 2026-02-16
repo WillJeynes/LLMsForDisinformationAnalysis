@@ -4,7 +4,7 @@ import random
 from pathlib import Path
 
 # Path to your JSONL file
-DATA_FILE = "../Wrapper/results.jsonl"
+DATA_FILE = "../../data/results.jsonl"
 
 # --------------------------
 # Helper functions

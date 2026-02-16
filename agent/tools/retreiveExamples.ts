@@ -3,14 +3,17 @@ import fs from "fs";
 import { pipeline, cos_sim } from "@huggingface/transformers";
 import bm25Factory from "wink-bm25-text-search";
 import nlp from "wink-nlp-utils";
-import { logger } from "../../utils/logger";
+import { logger } from "../utils/logger";
+import readline from "readline";
 
 const CSV_PATHS = [
-  "./tools/clan/dev-eng.csv",
-  "./tools/clan/train-eng.csv",
+  "../data/dev-eng.csv",
+  "../data/train-eng.csv",
 ];
 
-const CACHE_PATH = "./tools/clan/csv.cache.json";
+const CACHE_PATH = "../data/csv.cache.json";
+
+const JSONL_PATH = "../data/results.jsonl"
 
 type EmbeddingCache = {
   rawtexts: string[];
@@ -36,6 +39,13 @@ let csvEmbeddings: number[][] = [];
 let csvBM25: any = null;
 let csvLoaded = false;
 
+let jsonlRawtexts: string[] = [];
+let jsonlCleantexts: string[] = [];
+let jsonlEmbeddings: number[][] = [];
+let jsonlBM25: any = null;
+let jsonlLoaded = false;
+
+
 logger.info("Loading embedding model...");
 const featureExtractor = await pipeline(
   "feature-extraction",
@@ -43,12 +53,12 @@ const featureExtractor = await pipeline(
 );
 logger.info("Embedding model loaded");
 
-//Cached entrypoint
-export async function rankFromCSV(
+//Cached entrypoints
+export async function rankNormalizedClaims(
   query: string,
   topK = 5
 ): Promise<RankedResult[]> {
-  await ensureCSVLoaded();
+  await ensureNormalizedClaimCSVLoaded();
 
   logger.info("Ranking from CSV cache...");
 
@@ -74,6 +84,40 @@ export async function rankFromCSV(
     .sort((a, b) => b.fusedScore - a.fusedScore);
 
   logger.info("Ranking complete (CSV mode)");
+
+  return ranked.slice(0, topK);
+}
+
+export async function rankExampleTriggerEvents(
+  query: string,
+  topK = 5
+): Promise<RankedResult[]> {
+  await ensureExampleClaimJsonlLoaded();
+
+  logger.info("Ranking from JSONL cache...");
+
+  const queryEmbedding = await embedText(query);
+
+  const denseScores = jsonlEmbeddings.map((docEmbedding) =>
+    cos_sim(docEmbedding, queryEmbedding)
+  );
+
+  const sparseScores = computeSparseScores(query, jsonlBM25, jsonlRawtexts);
+
+  const fusedScores = reciprocalRankFusion([denseScores, sparseScores]);
+
+  const ranked = jsonlRawtexts
+    .map((text, i) => ({
+      id: i,
+      rawtext: text,
+      cleantext: jsonlCleantexts[i],
+      denseScore: denseScores[i],
+      sparseScore: sparseScores[i],
+      fusedScore: fusedScores[i],
+    }))
+    .sort((a, b) => b.fusedScore - a.fusedScore);
+
+  logger.info("Ranking complete (JSONL mode)");
 
   return ranked.slice(0, topK);
 }
@@ -121,7 +165,7 @@ export async function rankDynamically(
 }
 
 //CSV stuff
-async function ensureCSVLoaded(): Promise<void> {
+async function ensureNormalizedClaimCSVLoaded(): Promise<void> {
   if (csvLoaded) return;
 
   logger.info("Initializing CSV ranking mode...");
@@ -143,7 +187,7 @@ async function ensureCSVLoaded(): Promise<void> {
     const seen = new Set<string>();
 
     for (const path of CSV_PATHS) {
-      await processCSV(path, seen);
+      await processNormalizationCSV(path, seen);
     }
 
     const cache: EmbeddingCache = {
@@ -162,7 +206,7 @@ async function ensureCSVLoaded(): Promise<void> {
   logger.info("CSV mode ready");
 }
 
-async function processCSV(
+async function processNormalizationCSV(
   path: string,
   seen: Set<string>
 ): Promise<void> {
@@ -188,6 +232,40 @@ async function processCSV(
   }
 
   logger.info("Finished CSV: %s", path);
+}
+
+async function ensureExampleClaimJsonlLoaded(): Promise<void> {
+  if (jsonlLoaded) return;
+
+  logger.info("Initializing JSONL ranking...");
+  //TODO: make jsonl parsins
+  const stream = fs.createReadStream(JSONL_PATH);
+
+  const rl = readline.createInterface({
+    input: stream,
+    crlfDelay: Infinity,
+  });
+
+  for await (const line of rl) {
+    if (!line.trim()) continue; // skip empty lines
+
+    const row = JSON.parse(line);
+
+    const text = row.text;
+
+    const embedding = await embedText(text);
+
+    jsonlRawtexts.push(text);
+
+    jsonlCleantexts.push(row.output[0].content);
+    jsonlEmbeddings.push(embedding);
+  }
+
+
+  jsonlBM25 = buildBM25(jsonlRawtexts);
+
+  jsonlLoaded = true;
+  logger.info("JSONL ranking done");
 }
 
 
@@ -277,3 +355,6 @@ function reciprocalRankFusion(
 //     ]
 //   )
 // );
+
+// await ensureExampleClaimJsonlLoaded()
+// console.log(await rankExampleTriggerEvents("Niger"))

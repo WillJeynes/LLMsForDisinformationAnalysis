@@ -2,7 +2,7 @@ import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 import { queryScraper } from "./webSearch";
 import { extractWebpageContent } from "./webpageFetch";
-import { rankDynamically } from "./clan/retreiveExamples";
+import { rankDynamically } from "./retreiveExamples";
 
 
 export async function rankAndDisplayData(data: string[], context: string):Promise<string> {

@@ -10,6 +10,7 @@ import { produceRanking } from "./nodes/produceRanking";
 import { createModelNode } from "./nodes/model";
 import { loopEndConditional } from "./conditionals/loop_end";
 import { sort } from "./nodes/sort";
+import { triggerEventSetup } from "./nodes/triggerEventSetup";
 
 const triggerEventToolNode = createToolNode(triggerEventToolsByName);
 
@@ -26,6 +27,7 @@ const agent = new StateGraph(MessagesState)
   .addNode(normalizationSetup.name, normalizationSetup)
   .addNode("normalisationModel", normalisationModel)
   
+  .addNode(triggerEventSetup.name, triggerEventSetup)
   .addNode("triggerEventToolNode", triggerEventToolNode)
   .addNode("triggerEventModel", triggerEventModel)
 
@@ -39,7 +41,9 @@ const agent = new StateGraph(MessagesState)
   
   .addEdge(START, normalizationSetup.name)
   .addEdge(normalizationSetup.name, "normalisationModel")
-  .addEdge("normalisationModel", "triggerEventModel")
+  .addEdge("normalisationModel", triggerEventSetup.name)
+
+  .addEdge(triggerEventSetup.name, "triggerEventModel")
   
   // @ts-expect-error
   .addConditionalEdges("triggerEventModel", triggerEventToolConditional, ["triggerEventToolNode", verificationSetup.name])

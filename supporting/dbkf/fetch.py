@@ -13,16 +13,16 @@ DEFAULT_PARAMS = {
     "concept": "http://weverify.eu/resource/Concept/Q212",
     "documentTypes": "http://schema.org/Claim",
     "from": "2000-01-01",
-    "to": "2023-10-17",
+    "to": "2026-10-17",
     "lang": "en",
-    "limit": 50,  # Max per page
+    "limit": 300,  # Max per page
     "page": 1,
     "orderBy": "date"
 }
 
 NUM_RANDOM_CLAIMS = 10
 
-OUTPUT_FILE = "../Wrapper/claims.json"
+OUTPUT_FILE = "../../data/claims.json"
 
 def fetch_claims(params=None):
     if params is None:

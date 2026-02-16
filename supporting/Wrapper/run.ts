@@ -5,8 +5,8 @@ import cliProgress from "cli-progress";
 import pLimit from "p-limit";
 
 
-const INPUT_FILE = "./claims.json";
-const OUTPUT_FILE = "./results.jsonl";
+const INPUT_FILE = "../../data/claims.json";
+const OUTPUT_FILE = "../../data/results.jsonl";
 const API_URL = "http://localhost:2024";
 const AGENT_NAME = "agent";
 const MAX_CONCURRENCY = 50;

@@ -4,7 +4,7 @@ from statistics import mean
 # ------------------------------------------------------------
 # Load JSONL file
 # ------------------------------------------------------------
-DATA_FILE = "../Wrapper/results.jsonl"
+DATA_FILE = "../../data/results.jsonl"
 
 data = []
 with open(DATA_FILE, "r", encoding="utf-8") as f:
