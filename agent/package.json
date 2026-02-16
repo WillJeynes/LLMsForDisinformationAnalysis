@@ -8,7 +8,9 @@
   "main": "agent.ts",
   "scripts": {
     "agent": "npx @langchain/langgraph-cli dev",
-    "ragas_service": "cd ../supporting/RAGAS_Service && .venv/bin/uvicorn ragas_service:app --port 8001"
+    "ragas_service": "cd ../supporting/RAGAS_Service && .venv/bin/uvicorn ragas_service:app --port 8001",
+    "frontend": "cd ../supporting/scorer && .venv/bin/streamlit run display.py",
+    "fetch": "cd ../supporting/dbkf & python fetch.py"
   },
   "dependencies": {
     "@huggingface/transformers": "^3.8.1",
