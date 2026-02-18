@@ -24,6 +24,7 @@ def load_data(file_path):
                                 o["content_parsed"] = json.loads(o["content"])
                             except json.JSONDecodeError:
                                 o["content_parsed"] = []
+                                print("parse error")
                     data.append(entry)
     return data
 
@@ -68,59 +69,80 @@ if view == "All Claims":
                 st.markdown("---")
 
 # --------------------------
-# Single Claim Random View
+# Single Claim Random View (Ranking Based)
 # --------------------------
 elif view == "Single Claim Random":
-    # Rebuild the list of unscored claims only when needed
+
+    # Select an entry that still has unscored items
     if st.session_state.current_claim is None:
-        single_claims = []
+        unscored_entries = []
+
         for entry in st.session_state.data:
-            url = entry.get("documentUrl")
-            text = entry.get("text")
+            unscored = []
+
             for o in entry.get("output", []):
                 for c in o.get("content_parsed", []):
-                    if "human_score" not in c or c.get("human_score") is None:
-                        single_claims.append({
-                            "documentUrl": url,
-                            "text": text,
-                            "event": c.get("event"),
-                            "reasoningWhyRelevant": c.get("reasoningWhyRelevant"),
-                            "raw_obj": c  # reference to original object
-                        })
-        if single_claims:
-            st.session_state.current_claim = random.choice(single_claims)
+                    if c.get("human_score") is None:
+                        unscored.append(c)
+
+            if unscored:
+                unscored_entries.append({
+                    "entry": entry,
+                    "claims": unscored
+                })
+
+        if unscored_entries:
+            st.session_state.current_claim = random.choice(unscored_entries)
         else:
             st.session_state.current_claim = None
 
-    claim = st.session_state.current_claim
+    bundle = st.session_state.current_claim
 
-    if claim is None:
-        st.info("No claims available without a human score.")
+    if bundle is None:
+        st.info("No entries remaining without human scores.")
     else:
-        st.subheader(f"{claim['text']}")
-        st.markdown(f"**Event:** {claim['event']}")
-        st.markdown(f"**Reasoning:** {claim['reasoningWhyRelevant']}")
+        entry = bundle["entry"]
+        claims = bundle["claims"]
 
-        # Input for new human score
-        new_score = st.number_input(
-            "Provide a score (0 to 1)",
-            min_value=0.0,
-            max_value=1.0,
-            value=0.5,
-            step=0.01,
-            format="%.2f"
-        )
+        st.subheader(entry.get("text"))
 
-        if st.button("Submit Score"):
-            # Update the original object
-            claim["raw_obj"]["human_score"] = new_score
+        st.write("Rank events (1 = best / most relevant)")
 
-            # Save immediately
+        rankings = []
+
+        # Collect rankings
+        for i, c in enumerate(claims):
+            st.markdown(f"### Event {i+1}")
+            st.markdown(f"**Event:** {c.get('event')}")
+            st.markdown(f"**Reasoning:** {c.get('reasoningWhyRelevant')}")
+
+            rank = st.number_input(
+                f"Rank for event {i+1}",
+                min_value=1,
+                max_value=len(claims),
+                key=f"rank_{i}"
+            )
+
+            rankings.append((c, rank))
+
+        if st.button("Submit Ranking"):
+
+            # Sort by rank (ascending = best)
+            rankings.sort(key=lambda x: x[1])
+
+            n = len(rankings)
+
+            # Convert ranking -> normalized score
+            for idx, (claim_obj, _) in enumerate(rankings):
+                if n == 1:
+                    score = 1.0
+                else:
+                    score = 1 - (idx / (n - 1))
+
+                claim_obj["human_score"] = round(score, 3)
+
             save_data(DATA_FILE, st.session_state.data)
-            st.success("Score saved!")
+            st.success("Ranking converted to scores and saved!")
 
-            # Clear current claim so a new one will be selected next run
             st.session_state.current_claim = None
-
-            # Rerun app to show a new claim
             st.rerun()

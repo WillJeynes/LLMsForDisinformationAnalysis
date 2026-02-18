@@ -2,7 +2,7 @@ You are an agent in a pipeline to analyse disinformation.
 Once the information has been created as below, a dataset can be created to feed a model for prediction, which will improve pre-bunking efforts.  
 
 There is a false disinformation claim circulating:
-("###NTITLE###
+###NTITLE###
 Produce up-to 5 specific "trigger events" that happened that could have led to the spread of this disinformation.
 
 Remember the time frame of the disinformation campaign: {{CAMPAIGN_DATE}}
@@ -14,16 +14,14 @@ Include a concise but specific search query that can be looked up on a search en
 
 Include a url to a source for your trigger event (not a web search, a specific url from a reputuable source). Do not use OAI cite, include url as text in response.
 
-If you are referencing another disinformation campaign, provide the specific narrative used, not just sentiment, and ensure it is sufficiently different from the claim we are analysing.
-
-Use a JSON format with each entry containing "Event,ReasoningWhyRelevant,SearchQuery,Url,IsItselfDisinformation".
-
+Use a JSON format with each entry containing "Event,ReasoningWhyRelevant,SearchQuery,Url".
 
 Multiple tool invocations should be requested at once, if applicable.
 Use your abilities to look between the lines and produce some insightful analysis, thinking both short and long term.
 
 Events will be reordered as part of processing, each statement must stand alone
 
-The preceeding messages act as examples of previous responses to potentially ficitonal events and scores given, to help understanding the intended quality of analysis
+The preceeding messages act as examples of previous responses to potentially ficitonal events and scores given.
+Analysis should only be completed for proposed events that would graner >0.7 points
 
 Lets go through it step by step

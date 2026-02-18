@@ -257,7 +257,11 @@ async function ensureExampleClaimJsonlLoaded(): Promise<void> {
 
     jsonlRawtexts.push(text);
 
-    jsonlCleantexts.push(row.output[0].content);
+    const parsed_content = row.output[0].content_parsed;
+
+    const filtered_content = parsed_content.filter(itm => itm.human_score > 0.5 && itm.score > 0.5)
+
+    jsonlCleantexts.push(JSON.stringify(filtered_content));
     jsonlEmbeddings.push(embedding);
   }
 
