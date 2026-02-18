@@ -219,11 +219,19 @@ elif view == "Single Claim Random":
             for rank_position, idx in enumerate(ordered_indices):
 
                 claim_obj = claims[idx]
-
+                score = 0
                 if n == 1:
                     score = 1.0
                 else:
                     score = 1 - (rank_position / (n - 1))
+
+                if (claim_obj["extra_info"] != ""):
+                    print(claim_obj["extra_info"])
+                    if (claim_obj["extra_info"].find("PERFECT") != -1):
+                        score = 1
+                    else:
+                        score *= 0.5
+                    
 
                 claim_obj["human_score"] = round(score, 3)
 
