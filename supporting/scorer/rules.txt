@@ -1,4 +1,4 @@
 1. Proposed trigger events rewording the initial prompt should penalised
 2. Proposed trigger events should be specific enough to create resonable analysis
 3. Proposed trigger events should be time-specific. A trigger events that happened after the event is invalid
-4. Proposed trigger events should not describe a story of propogation
+4. Proposed trigger events should not describe a story of propogation (discussions on debunk articles is invalid)

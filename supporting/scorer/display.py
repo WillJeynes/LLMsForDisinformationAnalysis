@@ -29,16 +29,18 @@ def load_data(file_path):
     return data
 
 def save_data(file_path, data):
-    """Save the updated data back to JSONL file."""
     with open(file_path, "w", encoding="utf-8") as f:
         for entry in data:
             for o in entry.get("output", []):
                 if "content_parsed" in o:
-                    o["content"] = json.dumps(o["content_parsed"], ensure_ascii=False)
+                    o["content"] = json.dumps(
+                        o["content_parsed"],
+                        ensure_ascii=False
+                    )
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 # --------------------------
-# Initialize session state
+# Session State Init
 # --------------------------
 if "data" not in st.session_state:
     st.session_state.data = load_data(DATA_FILE)
@@ -46,35 +48,49 @@ if "data" not in st.session_state:
 if "current_claim" not in st.session_state:
     st.session_state.current_claim = None
 
+if "drag_order" not in st.session_state:
+    st.session_state.drag_order = None
+
+st.set_page_config(
+    page_title="Claim Visualizer",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 st.title("Claim Visualizer")
 
 # --------------------------
 # Sidebar
 # --------------------------
-view = st.sidebar.selectbox("Choose View", ["All Claims", "Single Claim Random"])
+view = st.sidebar.selectbox(
+    "Choose View",
+    ["All Claims", "Single Claim Random", "View Rules"]
+)
 
 # --------------------------
-# All Claims View
+# ALL CLAIMS VIEW
 # --------------------------
 if view == "All Claims":
     st.header("All Claims")
     for entry in st.session_state.data:
-        st.subheader(f"{entry.get('text')}")
+        st.subheader(entry.get("text"))
+
         for o in entry.get("output", []):
             for c in o.get("content_parsed", []):
                 st.markdown(f"**Event:** {c.get('event')}")
                 st.markdown(f"**Reasoning:** {c.get('reasoningWhyRelevant')}")
                 st.markdown(f"**Score:** {c.get('score')}")
                 st.markdown(f"**Human Score:** {c.get('human_score')}")
+                st.markdown(f"**Extra Info:** {c.get('extra_info', '')}")
                 st.markdown("---")
 
 # --------------------------
-# Single Claim Random View (Ranking Based)
+# SINGLE CLAIM RANDOM VIEW
 # --------------------------
-elif view == "Single Claim Random":
 
-    # Select an entry that still has unscored items
+elif view == "Single Claim Random":
+    # Select new entry if needed
     if st.session_state.current_claim is None:
+
         unscored_entries = []
 
         for entry in st.session_state.data:
@@ -93,6 +109,7 @@ elif view == "Single Claim Random":
 
         if unscored_entries:
             st.session_state.current_claim = random.choice(unscored_entries)
+            st.session_state.drag_order = None
         else:
             st.session_state.current_claim = None
 
@@ -106,43 +123,119 @@ elif view == "Single Claim Random":
 
         st.subheader(entry.get("text"))
 
-        st.write("Rank events (1 = best / most relevant)")
+        # --------------------------
+        # Stable Drag IDs (FIX)
+        # --------------------------
 
-        rankings = []
+        claim_ids = [str(i) for i in range(len(claims))]
 
-        # Collect rankings
-        for i, c in enumerate(claims):
-            st.markdown(f"### Event {i+1}")
-            st.markdown(f"**Event:** {c.get('event')}")
-            st.markdown(f"**Reasoning:** {c.get('reasoningWhyRelevant')}")
+        # Initialize order only once
+        if (
+            st.session_state.drag_order is None
+            or len(st.session_state.drag_order) != len(claim_ids)
+        ):
+            st.session_state.drag_order = claim_ids.copy()
 
-            rank = st.number_input(
-                f"Rank for event {i+1}",
-                min_value=1,
-                max_value=len(claims),
-                key=f"rank_{i}"
-            )
+        ordered_indices = [
+            int(i) for i in st.session_state.drag_order
+        ]
 
-            rankings.append((c, rank))
+        # --------------------------
+        # Annotation Section
+        # --------------------------
+
+        st.subheader("Annotate Events")
+
+        for pos, idx in enumerate(ordered_indices):
+            c = claims[idx]
+
+            with st.container(border=True):
+
+                st.markdown(f"**Event:** {c.get('event')}")
+                st.markdown(
+                    f"**Reasoning:** {c.get('reasoningWhyRelevant')}"
+                )
+
+                cols = st.columns(5)
+
+                temp = ""
+
+                with cols[0]:
+                    a = st.checkbox("Rewording", key = "R" + str(idx) + c.get('event') )
+                    temp += "REWORDING " if a else ""
+
+                with cols[1]:
+                    a = st.checkbox("Not Specific", key = "S" + str(idx) + c.get('event') )
+                    temp += "NSPECIFIC " if a else ""
+
+                with cols[2]:
+                    a = st.checkbox("Time Incorrect", key = "T" + str(idx) + c.get('event') )
+                    temp += "TINCORRECT " if a else ""
+
+                with cols[3]:
+                    a = st.checkbox("Story?", key = "Y" + str(idx) + c.get('event') )
+                    temp += "STORY " if a else ""
+                
+                with cols[4]:
+                    a = st.checkbox("Perfect", key = "P" + str(idx) + c.get('event') )
+                    temp += "PERFECT " if a else ""
+
+                c["extra_info"] = temp
+
+                # ---- MOVE BUTTONS ----
+                move_cols = st.columns(2)
+
+                with move_cols[0]:
+                    if st.button(
+                        "Up",
+                        key="UP" + str(idx) + c.get("event")
+                    ):
+                        if pos > 0:
+                            order = st.session_state.drag_order
+                            order[pos], order[pos - 1] = order[pos - 1], order[pos]
+                            st.session_state.drag_order = order
+                            st.rerun()
+
+                with move_cols[1]:
+                    if st.button(
+                        "Down",
+                        key="DOWN" + str(idx) + c.get("event")
+                    ):
+                        if pos < len(st.session_state.drag_order) - 1:
+                            order = st.session_state.drag_order
+                            order[pos], order[pos + 1] = order[pos + 1], order[pos]
+                            st.session_state.drag_order = order
+                            st.rerun()
+
+
+        # --------------------------
+        # Submit Ranking
+        # --------------------------
 
         if st.button("Submit Ranking"):
 
-            # Sort by rank (ascending = best)
-            rankings.sort(key=lambda x: x[1])
+            n = len(ordered_indices)
 
-            n = len(rankings)
+            for rank_position, idx in enumerate(ordered_indices):
 
-            # Convert ranking -> normalized score
-            for idx, (claim_obj, _) in enumerate(rankings):
+                claim_obj = claims[idx]
+
                 if n == 1:
                     score = 1.0
                 else:
-                    score = 1 - (idx / (n - 1))
+                    score = 1 - (rank_position / (n - 1))
 
                 claim_obj["human_score"] = round(score, 3)
 
             save_data(DATA_FILE, st.session_state.data)
-            st.success("Ranking converted to scores and saved!")
+
+            print("Ranking converted to scores and saved!")
 
             st.session_state.current_claim = None
+            st.session_state.drag_order = None
+
             st.rerun()
+
+elif view == "View Rules":
+    with open("rules.txt", "r", encoding="utf-8") as f:
+        st.write(f.readlines())
