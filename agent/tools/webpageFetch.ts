@@ -29,6 +29,4 @@ export async function extractWebpageContent(url: string) : Promise<string[]>{
     }
 }
 
-//TODO: Extract, rank snippets
-
 //console.log(await extractWebpageContent("https://www.bbc.co.uk/news/live/c74wd01egvyt"))

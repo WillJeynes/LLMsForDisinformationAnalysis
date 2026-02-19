@@ -238,7 +238,6 @@ async function ensureExampleClaimJsonlLoaded(): Promise<void> {
   if (jsonlLoaded) return;
 
   logger.info("Initializing JSONL ranking...");
-  //TODO: make jsonl parsins
   const stream = fs.createReadStream(JSONL_PATH);
 
   const rl = readline.createInterface({

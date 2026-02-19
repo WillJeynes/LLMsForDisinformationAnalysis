@@ -22,6 +22,5 @@ Use your abilities to look between the lines and produce some insightful analysi
 Events will be reordered as part of processing, each statement must stand alone
 
 The preceeding messages act as examples of previous responses to potentially ficitonal events and scores given.
-Analysis should only be completed for proposed events that would graner >0.7 points
 
 Lets go through it step by step

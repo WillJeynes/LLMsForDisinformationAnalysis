@@ -27,16 +27,15 @@ const webSearch = tool(
 );
 
 const openWebpage = tool(
-  async ({ a, b }) => {
+  async ({ a }) => {
     const data = await extractWebpageContent(a);
-    return rankAndDisplayData(data, b);
+    return data;
   },
   {
-    name: "OpenWebpage",
-    description: "Opens webpage and returns most relevent snippets",
+    name: "WebRetreiveUrl",
+    description: "Fetches and reads the FULL contents of a webpage. REQUIRED when detailed or accurate information is needed.",
     schema: z.object({
-      a: z.string().describe("URL"),
-      b: z.string().describe("What to match against in webpage content"),
+      a: z.url().describe("URL")
     }),
   }
 );
