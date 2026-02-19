@@ -23,8 +23,10 @@ type ResultRecord = {
   documentUrl: string;
   text: string;
   status: "success" | "error";
+  normalized?: string,
   output?: any;
   error?: string;
+  dump?: any;
 };
 
 function appendResult(record: ResultRecord) {
@@ -42,10 +44,13 @@ async function processClaim(claim: Claim): Promise<ResultRecord> {
         input: {
           disinformationTitle: claim.text,
         },
-        streamMode: "messages-tuple",
-        recursionLimit: 100,
+        streamMode: "values",
+        config: {
+          recursion_limit: 50
+        }
       }
     );
+    
 
     let lastMessage: any = null;
 
@@ -60,14 +65,15 @@ async function processClaim(claim: Claim): Promise<ResultRecord> {
       documentUrl: claim.documentUrl,
       text: claim.text,
       status: "success",
-      output: lastMessage,
+      output: lastMessage.messages?.at(-1) ?? "",
+      normalized: lastMessage.normalizedClaim
     };
   } catch (err: any) {
     return {
       documentUrl: claim.documentUrl,
       text: claim.text,
       status: "error",
-      error: err?.message ?? String(err),
+      error: err?.message ?? String(err)
     };
   }
 }

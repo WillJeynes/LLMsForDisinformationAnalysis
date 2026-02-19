@@ -13,7 +13,7 @@ const CSV_PATHS = [
 
 const CACHE_PATH = "../data/csv.cache.json";
 
-const JSONL_PATH = "../data/results.jsonl"
+const JSONL_PATH = "../data/input.jsonl"
 
 type EmbeddingCache = {
   rawtexts: string[];

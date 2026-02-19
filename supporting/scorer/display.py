@@ -4,7 +4,8 @@ import random
 from pathlib import Path
 
 # Path to your JSONL file
-DATA_FILE = "../../data/results.jsonl"
+INPUT_FILE = "../../data/results.jsonl"
+OUTPUT_FILE = "../../data/ranked.jsonl"
 
 # --------------------------
 # Helper functions
@@ -13,20 +14,50 @@ DATA_FILE = "../../data/results.jsonl"
 def load_data(file_path):
     """Load JSONL file into a list of dicts with parsed content."""
     data = []
+
     if Path(file_path).exists():
         with open(file_path, "r", encoding="utf-8") as f:
             for line in f:
-                if line.strip():
-                    entry = json.loads(line)
-                    for o in entry.get("output", []):
-                        if "content" in o:
-                            try:
-                                o["content_parsed"] = json.loads(o["content"])
-                            except json.JSONDecodeError:
-                                o["content_parsed"] = []
-                                print("parse error")
-                    data.append(entry)
+                if not line.strip():
+                    continue
+
+                entry = json.loads(line)
+
+                outputs = entry.get("output", [])
+
+                # ---- normalize format ----
+                # old format: list
+                # new format: single dict
+                if isinstance(outputs, dict):
+                    outputs = [outputs]
+
+                # ---- parse content ----
+                for o in outputs:
+                    content = o.get("content")
+
+                    if content:
+                        try:
+                            o["content_parsed"] = json.loads(content)
+                        except json.JSONDecodeError:
+                            o["content_parsed"] = []
+                            print("parse error")
+
+                # optionally store normalized outputs back
+                entry["output"] = outputs
+
+                data.append(entry)
+
     return data
+
+def save_data_clean(file_path, data):
+    with open(file_path, "w", encoding="utf-8") as f:
+        for entry in data:
+            for o in entry.get("output", []):
+                if "content_parsed" in o:
+                    entry["events"] = o["content_parsed"] 
+            del entry["output"]
+            del entry["status"]
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 def save_data(file_path, data):
     with open(file_path, "w", encoding="utf-8") as f:
@@ -39,11 +70,12 @@ def save_data(file_path, data):
                     )
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
+
 # --------------------------
 # Session State Init
 # --------------------------
 if "data" not in st.session_state:
-    st.session_state.data = load_data(DATA_FILE)
+    st.session_state.data = load_data(INPUT_FILE)
 
 if "current_claim" not in st.session_state:
     st.session_state.current_claim = None
@@ -235,7 +267,9 @@ elif view == "Single Claim Random":
 
                 claim_obj["human_score"] = round(score, 3)
 
-            save_data(DATA_FILE, st.session_state.data)
+            save_data(INPUT_FILE, st.session_state.data)
+            save_data_clean(OUTPUT_FILE, st.session_state.data)
+
 
             print("Ranking converted to scores and saved!")
 
