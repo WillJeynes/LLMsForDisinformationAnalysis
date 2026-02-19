@@ -3,6 +3,7 @@ import * as z from "zod";
 import { queryScraper } from "./webSearch";
 import { extractWebpageContent } from "./webpageFetch";
 import { rankDynamically } from "./retreiveExamples";
+import { logger } from "../utils/logger";
 
 
 export async function rankAndDisplayData(data: string[], context: string):Promise<string> {
@@ -14,6 +15,7 @@ export async function rankAndDisplayData(data: string[], context: string):Promis
 // Define tools
 const webSearch = tool(
   async ({ a }) => {
+    logger.info("Using Web Search")
     const data = await queryScraper(a);
     return await rankAndDisplayData(data, a);
   },
@@ -28,6 +30,7 @@ const webSearch = tool(
 
 const openWebpage = tool(
   async ({ a }) => {
+    logger.info("Using Open Webpage")
     const data = await extractWebpageContent(a);
     return data;
   },

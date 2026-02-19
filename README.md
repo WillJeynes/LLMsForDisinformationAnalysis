@@ -10,7 +10,13 @@ Final Dissertation Submission Repository
 ## Repository Structure
 ```
 ├── run.sh                          # Bash script to run project elements from one place
-├── data/                           # Holder from project data, filled using scripts
+├── data/                           # Holder from project data
+|   ├── claims.json                 # Retreived claims from dbkf fetcher
+|   ├── dev-eng.csv
+|   ├── train-eng.csv               # Normalized disinformation claims in CSV format from CLAN
+|   ├── input.jsonl                 # Response in raw format to give as context to agent
+|   ├── ranked.jsonl                # Cleaned trigger event response from scorer frontend
+|   └── results.jsonl               # Output from wrapper script, read and modified by scorer
 ├── literature/
 |   └── report.pdf                  # Final submission report
 ├── agent/                          # Code for main project pipeline

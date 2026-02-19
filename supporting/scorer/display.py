@@ -258,7 +258,6 @@ elif view == "Single Claim Random":
                     score = 1 - (rank_position / (n - 1))
 
                 if (claim_obj["extra_info"] != ""):
-                    print(claim_obj["extra_info"])
                     if (claim_obj["extra_info"].find("PERFECT") != -1):
                         score = 1
                     else:
