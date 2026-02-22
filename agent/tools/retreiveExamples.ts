@@ -244,22 +244,27 @@ async function ensureExampleClaimJsonlLoaded(): Promise<void> {
     input: stream,
     crlfDelay: Infinity,
   });
+  let skipped = 0;
 
   for await (const line of rl) {
     if (!line.trim()) continue; // skip empty lines
 
     const row = JSON.parse(line);
 
+    const parsed_content = row.events;
+
+    const filtered_content = parsed_content.filter(itm => itm.human_score > 0.5 && itm.score > 0.5)
+
+    if (filtered_content.length == 0) {
+      skipped++;
+      continue;
+    }
+
     const text = row.text;
 
     const embedding = await embedText(text);
 
     jsonlRawtexts.push(text);
-
-    const parsed_content = row.events;
-
-    const filtered_content = parsed_content.filter(itm => itm.human_score > 0.5 && itm.score > 0.5)
-
     jsonlCleantexts.push(JSON.stringify(filtered_content));
     jsonlEmbeddings.push(embedding);
   }
@@ -268,7 +273,7 @@ async function ensureExampleClaimJsonlLoaded(): Promise<void> {
   jsonlBM25 = buildBM25(jsonlRawtexts);
 
   jsonlLoaded = true;
-  logger.info("JSONL ranking done");
+  logger.info("JSONL ranking done, %s items skipped for having no good events", skipped);
 }
 
 
