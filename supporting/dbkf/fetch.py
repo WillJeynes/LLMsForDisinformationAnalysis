@@ -11,16 +11,16 @@ BASE_URL = "https://dbkf.ontotext.com/rest-api/search/documents"
 
 DEFAULT_PARAMS = {
     "concept": "http://weverify.eu/resource/Concept/Q212",
-    "documentTypes": "http://schema.org/Claim",
+    # "documentTypes": "http://schema.org/Claim",
     "from": "2000-01-01",
-    "to": "2026-10-17",
+    "to": "2026-02-19",
     "lang": "en",
-    "limit": 300,  # Max per page
+    "limit": 5000,  # Max per page
     "page": 1,
     "orderBy": "date"
 }
 
-NUM_RANDOM_CLAIMS = 10
+NUM_RANDOM_CLAIMS = 20
 
 OUTPUT_FILE = "../../data/claims.json"
 

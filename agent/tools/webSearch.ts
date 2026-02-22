@@ -1,4 +1,5 @@
 import axios from "axios";
+import { checkDisinfo } from "./checkDisinfo";
 
 export async function queryScraper(query: string): Promise<string[]> {
     const instance = process.env.SCRAPER_INSTANCE;
@@ -44,6 +45,10 @@ export async function queryScraper(query: string): Promise<string[]> {
     const context = data.web ?? [];
 
     const lines: string[] = context.map((item: any) => {
+        if (checkDisinfo(item.url)) {
+            return "";
+        }
+
         const title = (item.title ?? "").trim();
         const desc = (item.description ?? "").trim();
         const link = (item.url ?? "").trim();

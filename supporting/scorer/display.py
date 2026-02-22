@@ -1,3 +1,4 @@
+import copy
 import streamlit as st
 import json
 import random
@@ -154,6 +155,7 @@ elif view == "Single Claim Random":
         claims = bundle["claims"]
 
         st.subheader(entry.get("text"))
+        st.write(entry.get("normalized", ""))
 
         # --------------------------
         # Stable Drag IDs (FIX)
@@ -267,7 +269,7 @@ elif view == "Single Claim Random":
                 claim_obj["human_score"] = round(score, 3)
 
             save_data(INPUT_FILE, st.session_state.data)
-            save_data_clean(OUTPUT_FILE, st.session_state.data)
+            save_data_clean(OUTPUT_FILE, copy.deepcopy(st.session_state.data))
 
 
             print("Ranking converted to scores and saved!")
