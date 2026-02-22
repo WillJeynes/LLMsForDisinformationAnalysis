@@ -22,7 +22,7 @@ type Claim = {
 type ResultRecord = {
   documentUrl: string;
   text: string;
-  status: "success" | "error";
+  status: "success" | "error" | "wrapper_crash";
   normalized?: string,
   output?: any;
   error?: string;
@@ -50,29 +50,37 @@ async function processClaim(claim: Claim): Promise<ResultRecord> {
         }
       }
     );
-    
 
-    let lastMessage: any = null;
+
+    let lastContent: any = null;
 
     for await (const chunk of stream) {
       // capture latest output
-      if (chunk?.data) {
-        lastMessage = chunk.data;
-      }
+      lastContent = chunk
     }
-
-    return {
-      documentUrl: claim.documentUrl,
-      text: claim.text,
-      status: "success",
-      output: lastMessage.messages?.at(-1) ?? "",
-      normalized: lastMessage.normalizedClaim
-    };
+    
+    if (lastContent?.event != "error") {
+      return {
+        documentUrl: claim.documentUrl,
+        text: claim.text,
+        status: "success",
+        output: lastContent.data.messages?.at(-1) ?? "",
+        normalized: lastContent.data.normalizedClaim
+      };
+    }
+    else {
+      return {
+        documentUrl: claim.documentUrl,
+        text: claim.text,
+        status: "error",
+        dump: lastContent
+      };
+    }
   } catch (err: any) {
     return {
       documentUrl: claim.documentUrl,
       text: claim.text,
-      status: "error",
+      status: "wrapper_crash",
       error: err?.message ?? String(err)
     };
   }

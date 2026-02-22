@@ -50,14 +50,45 @@ def load_data(file_path):
 
     return data
 
+
 def save_data_clean(file_path, data):
+    merged = {}
+
+    for entry in data:
+        # collect all content_parsed items from this entry
+        events = []
+        for o in entry.get("output", []):
+            if "content_parsed" in o:
+                events.extend(o["content_parsed"])
+
+        doc_url = entry.get("documentUrl")
+        if not doc_url:
+            continue
+
+        if doc_url not in merged:
+            # take the first object's other values
+            new_entry = entry.copy()
+            new_entry["events"] = events
+
+            # remove unwanted fields safely
+            new_entry.pop("output", None)
+            new_entry.pop("status", None)
+
+            merged[doc_url] = new_entry
+        else:
+            # merge events into existing entry
+            merged[doc_url]["events"].extend(events)
+
+    # sort events by human_score
+    for entry in merged.values():
+        entry["events"].sort(
+            key=lambda e: e.get("human_score", 0),
+            reverse=True  # highest score first; remove if you want ascending
+        )
+
+    # write merged results
     with open(file_path, "w", encoding="utf-8") as f:
-        for entry in data:
-            for o in entry.get("output", []):
-                if "content_parsed" in o:
-                    entry["events"] = o["content_parsed"] 
-            del entry["output"]
-            del entry["status"]
+        for entry in merged.values():
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 def save_data(file_path, data):
@@ -135,10 +166,22 @@ elif view == "Single Claim Random":
                         unscored.append(c)
 
             if unscored:
-                unscored_entries.append({
-                    "entry": entry,
-                    "claims": unscored
-                })
+                # try to find an existing entry with same documentUrl
+                existing = next(
+                    (item for item in unscored_entries
+                    if item["entry"]["documentUrl"] == entry["documentUrl"]),
+                    None
+                )
+
+                if existing:
+                    # append new claims to existing entry
+                    existing["claims"].extend(unscored)
+                else:
+                    # create new object
+                    unscored_entries.append({
+                        "entry": entry,
+                        "claims": list(unscored)
+                    })
 
         if unscored_entries:
             st.session_state.current_claim = random.choice(unscored_entries)
@@ -190,7 +233,7 @@ elif view == "Single Claim Random":
                     f"**Reasoning:** {c.get('reasoningWhyRelevant')}"
                 )
 
-                cols = st.columns(5)
+                cols = st.columns(7)
 
                 temp = ""
 
@@ -209,8 +252,16 @@ elif view == "Single Claim Random":
                 with cols[3]:
                     a = st.checkbox("Story?", key = "Y" + str(idx) + c.get('event') )
                     temp += "STORY " if a else ""
-                
+
                 with cols[4]:
+                    a = st.checkbox("Duplicate?", key = "D" + str(idx) + c.get('event') )
+                    temp += "DUPLICATE " if a else ""
+                
+                with cols[5]:
+                    a = st.checkbox("Bias Shown", key = "B" + str(idx) + c.get('event') )
+                    temp += "BIAS " if a else ""
+                
+                with cols[6]:
                     a = st.checkbox("Perfect", key = "P" + str(idx) + c.get('event') )
                     temp += "PERFECT " if a else ""
 
@@ -262,6 +313,8 @@ elif view == "Single Claim Random":
                 if (claim_obj["extra_info"] != ""):
                     if (claim_obj["extra_info"].find("PERFECT") != -1):
                         score = 1
+                    elif(claim_obj["extra_info"].find("DUPLICATE") != -1):
+                        score = 0
                     else:
                         score *= 0.5
                     

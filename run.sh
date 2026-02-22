@@ -32,21 +32,15 @@ run_wrapper () {
     npm run dev
 }
 
-run_analysis () {
-    cd supporting/scorer
-    python analyse.py
-}
-
 case "$1" in
     agent) run_agent ;;
     ragas_service) run_ragas_service ;;
     frontend) run_frontend ;;
     fetch) run_fetch ;;
     wrapper) run_wrapper ;;
-    analysis) run_analysis ;;
     *)
         echo "Unknown command: $1"
-        echo "Usage: ./runproject [agent|ragas_service|frontend|fetch|wrapper|analysis]"
+        echo "Usage: ./runproject [agent|ragas_service|frontend|fetch|wrapper]"
         exit 1
         ;;
 esac
