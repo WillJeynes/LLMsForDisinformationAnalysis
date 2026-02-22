@@ -1,5 +1,6 @@
 import axios from "axios";
 import { checkDisinfo } from "./checkDisinfo";
+import { writeToJSONL } from "../utils/writeToJSONL";
 
 export async function queryScraper(query: string): Promise<string[]> {
     const instance = process.env.SCRAPER_INSTANCE;
@@ -46,6 +47,7 @@ export async function queryScraper(query: string): Promise<string[]> {
 
     const lines: string[] = context.map((item: any) => {
         if (checkDisinfo(item.url)) {
+            writeToJSONL("blocked.jsonl", {url: item.url, query: query})
             return "";
         }
 
