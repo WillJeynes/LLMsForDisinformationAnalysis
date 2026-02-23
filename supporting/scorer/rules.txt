@@ -1,8 +1,17 @@
 1. Proposed trigger events rewording the initial prompt should penalised
+
 2. Proposed trigger events should be specific enough to create resonable analysis of that specific disinformation spread
+
+    2.1. Proposed trigger events should be verifiable (general ideas of sentiment are not admissable)
+
+    2.2. Proposed trigger events events should have a genuine causal link between the event and the disinformation
+
+    2.3 Proposed trigger events should avoid speculation
+
 3. Proposed trigger events should be time-specific. A trigger events that happened after the event is invalid
+
 4. Proposed trigger events should not describe a story of propogation (discussions on debunk articles is invalid)
+
 5. Proposed trigger events should be sufficiently different from one another
+
 6. Proposed trigger events must be free from bias, and backed up by reliable evidence
-7. Proposed trigger events should be verifiable (general ideas of sentiment are not admissable)
-8. Proposed trigger events events should have a genuine causal link between the event and the disinformation

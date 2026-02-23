@@ -9,16 +9,20 @@ BASE_URL = "https://dbkf.ontotext.com/rest-api/search/documents"
 # Ukraine: http://weverify.eu/resource/Concept/Q212
 # COVID: http://weverify.eu/resource/Concept/Q84263196
 
-DEFAULT_PARAMS = {
-    "concept": "http://weverify.eu/resource/Concept/Q212",
-    # "documentTypes": "http://schema.org/Claim",
-    "from": "2000-01-01",
-    "to": "2026-02-19",
-    "lang": "en",
-    "limit": 5000,  # Max per page
-    "page": 1,
-    "orderBy": "date"
-}
+# "documentTypes": "http://schema.org/Claim",
+DEFAULT_PARAMS = [
+    ("concept", "http://weverify.eu/resource/Concept/Q212"),
+    ("from", "2000-01-01"),
+    ("to", "2026-02-19"),
+    ("lang", "en"),
+    ("limit", 5000),
+    ("page", 1),
+    ("orderBy", "date"),
+
+    # duplicate keys allowed
+    ("organization", "http://weverify.eu/resource/Organization/3727f7b2aa90ec0716693e5464b28d18"), # StopFake
+    ("organization", "http://weverify.eu/resource/Organization/c71953fa6cf24ac4178f751c77862070"), # CheckYourFact
+]
 
 NUM_RANDOM_CLAIMS = 20
 

@@ -3,6 +3,8 @@ import streamlit as st
 import json
 import random
 from pathlib import Path
+from collections import Counter, defaultdict
+import pandas as pd
 
 # Path to your JSONL file
 INPUT_FILE = "../../data/results.jsonl"
@@ -127,7 +129,7 @@ st.title("Claim Visualizer")
 # --------------------------
 view = st.sidebar.selectbox(
     "Choose View",
-    ["All Claims", "Single Claim Random", "View Rules"]
+    ["All Claims", "Single Claim Random", "View Rules", "Statistics"]
 )
 
 # --------------------------
@@ -334,4 +336,135 @@ elif view == "Single Claim Random":
 
 elif view == "View Rules":
     with open("rules.txt", "r", encoding="utf-8") as f:
-        st.write(f.readlines())
+        st.write(f.read())
+
+elif view == "Statistics":
+
+    st.header("Statistics")
+
+    word_counter = Counter()
+    doc_scores = defaultdict(list)
+    diff_scores = defaultdict(list)
+
+    # ---- collect stats ----
+    for entry in st.session_state.data:
+        doc_url = entry.get("documentUrl")
+
+        for o in entry.get("output", []):
+            for c in o.get("content_parsed", []):
+
+                # ---- extra_info word counts ----
+                extra = c.get("extra_info", "")
+                if extra:
+                    words = extra.strip().split()
+                    word_counter.update(words)
+
+                # ---- human score aggregation ----
+                hs = c.get("human_score")
+                if hs is not None and doc_url:
+                    doc_scores[doc_url].append(hs)
+
+                # ---- diff score aggregation ----
+                s = c.get("score")
+                if hs is not None and s is not None and doc_url:
+                    diff = abs(hs - s)
+                    diff_scores[doc_url].append(diff)
+
+    # ==========================
+    # Extra Info Word Counts
+    # ==========================
+    st.subheader("Extra Info Label Counts")
+
+    if word_counter:
+        df_words = (
+            pd.DataFrame(word_counter.items(), columns=["Label", "Count"])
+            .sort_values("Count", ascending=False)
+        )
+
+        st.dataframe(df_words)
+        st.bar_chart(df_words.set_index("Label"))
+    else:
+        st.info("No extra_info data available yet.")
+
+    # ==========================
+    # Avg Human Score per Document
+    # ==========================
+    st.subheader("Average Human Score per documentUrl")
+
+    avg_scores = []
+
+    for doc, scores in doc_scores.items():
+        if scores:
+            avg_scores.append({
+                "documentUrl": doc,
+                "avg_human_score": sum(scores) / len(scores),
+                "num_events": len(scores)
+            })
+
+    if avg_scores:
+        df_scores = pd.DataFrame(avg_scores).sort_values(
+            "avg_human_score",
+            ascending=False
+        )
+
+        st.dataframe(df_scores)
+        # ==========================
+        # Distribution (rounded to 0.1)
+        # ==========================
+
+        st.subheader("Distribution of Average Human Scores (Rounded to 0.1)")
+
+        # round averages to nearest 0.1
+        df_scores["rounded_score"] = (
+            df_scores["avg_human_score"].round(1)
+        )
+
+        # count how many docs fall into each bucket
+        dist = (
+            df_scores["rounded_score"]
+            .value_counts()
+            .sort_index()
+            .reset_index()
+        )
+
+        dist.columns = ["rounded_score", "count"]
+
+        # ensure all bins from 0.0 → 1.0 exist
+        all_bins = pd.DataFrame({
+            "rounded_score": [round(x * 0.1, 1) for x in range(11)]
+        })
+
+        dist = (
+            all_bins.merge(dist, on="rounded_score", how="left")
+            .fillna(0)
+        )
+
+        dist["count"] = dist["count"].astype(int)
+
+        # plot counts per score bucket
+        st.bar_chart(
+            dist.set_index("rounded_score")["count"]
+        )
+    else:
+        st.info("No human scores available yet.")
+
+    # ==========================
+    # Overall Model vs Human Difference
+    # ==========================
+    st.subheader("Model vs Human Agreement")
+
+    all_diffs = [
+        diff
+        for diffs in diff_scores.values()
+        for diff in diffs
+    ]
+
+    if all_diffs:
+        avg_diff = sum(all_diffs) / len(all_diffs)
+
+        st.write(
+            f"Average absolute difference between model score and human score: "
+            f"**{avg_diff:.3f}**"
+        )
+    else:
+        st.info("No items have both score and human_score yet.")
