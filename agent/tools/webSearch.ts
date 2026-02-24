@@ -1,8 +1,30 @@
 import axios from "axios";
 import { checkDisinfo } from "./checkDisinfo";
 import { writeToJSONL } from "../utils/writeToJSONL";
+import { backOff } from "exponential-backoff";
+import { logger } from "../utils/logger";
 
 export async function queryScraper(query: string): Promise<string[]> {
+    try {
+        const response = await backOff(async () => {
+            return await queryScraperWorker(query);
+        },  {
+            numOfAttempts: 10,
+            startingDelay: 500,
+            timeMultiple: 2,
+            jitter: "full",
+            maxDelay: 50000,
+        })
+
+        return response;
+    }
+    catch (err: any) {
+        logger.error("Failed out of retry loop, returning placeholder to pipeline")
+        return ["API EXCEPTION"]
+    }
+}
+
+async function queryScraperWorker(query: string): Promise<string[]> {
     const instance = process.env.SCRAPER_INSTANCE;
     if (!instance) {
         throw new Error("SCRAPER_INSTANCE environment variable is not set");
@@ -28,9 +50,9 @@ export async function queryScraper(query: string): Promise<string[]> {
         response = await axios.get(url, { params });
     } catch (err: any) {
         if (err.response) {
-            throw new Error(
-                `HTTP error ${err.response.status}: ${JSON.stringify(err.response.data)}`
-            );
+            const desc = `HTTP error ${err.response.status}: ${JSON.stringify(err.response.data)}`
+            logger.error(desc)
+            throw new Error(desc);
         }
         throw err;
     }
@@ -38,7 +60,9 @@ export async function queryScraper(query: string): Promise<string[]> {
     const data = response.data;
 
     if (data?.status !== "ok") {
-        throw new Error(`API returned status: ${data?.status}`);
+        const desc = `API returned status: ${data?.status}`;
+        logger.error(desc)
+        throw new Error(desc);
     }
 
     // TEMP?: Convert API results to array of formatted strings.
@@ -47,7 +71,7 @@ export async function queryScraper(query: string): Promise<string[]> {
 
     const lines: string[] = context.map((item: any) => {
         if (checkDisinfo(item.url)) {
-            writeToJSONL("blocked.jsonl", {url: item.url, query: query})
+            writeToJSONL("blocked.jsonl", { url: item.url, query: query })
             return "";
         }
 

@@ -12,6 +12,7 @@ Final Dissertation Submission Repository
 ├── run.sh                          # Bash script to run project elements from one place
 ├── data/                           # Holder from project data
 |   ├── blocked.jsonl               # Web search results blocked by the Iffy list
+|   ├── error.log                   # Log file containing critical exceptions
 |   ├── claims.json                 # Retreived claims from dbkf fetcher
 |   ├── dev-eng.csv
 |   ├── train-eng.csv               # Normalized disinformation claims in CSV format from CLAN
