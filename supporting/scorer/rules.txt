@@ -15,3 +15,6 @@
 5. Proposed trigger events should be sufficiently different from one another
 
 6. Proposed trigger events must be free from bias, and backed up by reliable evidence
+
+Edge case handing:
+In the event analysis is perfect, however contains section(s) that violate one of the above, a worst case approach should be taken and the analysis should be laballed negativley
