@@ -9,7 +9,7 @@ const INPUT_FILE = "../../data/claims.json";
 const OUTPUT_FILE = "../../data/results.jsonl";
 const API_URL = "http://localhost:2024";
 const AGENT_NAME = "agent";
-const MAX_CONCURRENCY = 50;
+const MAX_CONCURRENCY = 5;
 
 const client = new Client({ apiUrl: API_URL });
 

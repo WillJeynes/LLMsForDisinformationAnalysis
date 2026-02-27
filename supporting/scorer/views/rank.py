@@ -10,7 +10,7 @@ def page_title() -> str:
     return "Rank"
 
 def render():
-    st.header("Rank PERFECT Events")
+    st.header("Rank Events")
     candidates = []
 
     for entry in st.session_state.data:
@@ -25,7 +25,7 @@ def render():
             candidates.append({"entry": entry, "claims": perfect})
 
     if not candidates:
-        st.info("No PERFECT events available.")
+        st.info("No events available.")
         st.stop()
 
     if "current_bundle" not in st.session_state:
