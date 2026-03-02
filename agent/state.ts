@@ -17,6 +17,7 @@ export const ProposedTriggerEventArray = z.array(ProposedTriggerEvent);
 
 export const MessagesState = new StateSchema({
   disinformationTitle: z.string(),
+  date: z.string(),
   messages: MessagesValue,
   proposedTriggerEvent: ProposedTriggerEventArray,
   proposedTriggerEventIndex: z.int(),

@@ -5,7 +5,7 @@ There is a false disinformation claim circulating:
 ###NTITLE###
 Produce up-to 5 specific "trigger events" that happened that could have led to the spread of this disinformation.
 
-Remember the time frame of the disinformation campaign: {{CAMPAIGN_DATE}}
+Remember the time frame of the disinformation campaign: ###CDATE###
 Include no information or events that would not have been available at the time. 
 
 Produce no more text other than the json.

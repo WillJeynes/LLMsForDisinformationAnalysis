@@ -16,6 +16,7 @@ const client = new Client({ apiUrl: API_URL });
 type Claim = {
   documentUrl: string;
   text: string;
+  dateCreated: string;
   [key: string]: any;
 };
 
@@ -43,6 +44,7 @@ async function processClaim(claim: Claim): Promise<ResultRecord> {
       {
         input: {
           disinformationTitle: claim.text,
+          date: claim.dateCreated
         },
         streamMode: "values",
         config: {

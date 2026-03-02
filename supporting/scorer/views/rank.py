@@ -73,7 +73,7 @@ def render():
         st.markdown(c.get("reasoningWhyRelevant"))
         st.markdown("---")
 
-    if st.button("Submit PERFECT Ranking"):
+    if st.button("Submit Ranking"):
 
         n = len(order)
 
