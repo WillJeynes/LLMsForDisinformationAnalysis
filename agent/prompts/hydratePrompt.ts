@@ -7,10 +7,21 @@ export async function hydratePrompt(path: string, state: any) : Promise<string> 
 
     let raw = fs.readFileSync("prompts/" + path, "utf-8");
 
-    raw = raw.replace("###TITLE###", state.disinformationTitle);
-    raw = raw.replace("###LM###", state.messages.at(-1).content);
-    raw = raw.replace("###NTITLE###", state.normalizedClaim);
-    raw = raw.replace("###CDATE###", state.date);
+    if (raw.indexOf("###TITLE###") != -1) {
+        raw = raw.replace("###TITLE###", state.disinformationTitle);
+    }
+
+    if (raw.indexOf("###LM###") != -1) {
+        raw = raw.replace("###LM###", state.messages.at(-1).content);
+    }
+
+    if (raw.indexOf("###NTITLE###") != -1) {
+        raw = raw.replace("###NTITLE###", state.normalizedClaim);
+    }
+
+    if (raw.indexOf("###CDATE###") != -1) {
+        raw = raw.replace("###CDATE###", state.date);
+    }
 
     if (raw.indexOf("###TECLAIM###") != -1) {
         const title = state.proposedTriggerEvent[state.proposedTriggerEventIndex].Event

@@ -48,7 +48,10 @@ def save_data_clean(file_path, data):
             new_entry["events"] = events
             new_entry.pop("output", None)
             new_entry.pop("status", None)
+            new_entry["run_id"]
             merged[doc_url] = new_entry
+
+            
         else:
             merged[doc_url]["events"].extend(events)
 

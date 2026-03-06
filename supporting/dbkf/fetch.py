@@ -7,21 +7,24 @@ BASE_URL = "https://dbkf.ontotext.com/rest-api/search/documents"
 
 # search parameters 
 # Ukraine: http://weverify.eu/resource/Concept/Q212
+# ("organization", "http://weverify.eu/resource/Organization/3727f7b2aa90ec0716693e5464b28d18"), # StopFake
+# ("organization", "http://weverify.eu/resource/Organization/c71953fa6cf24ac4178f751c77862070"), # CheckYourFact
+
 # COVID: http://weverify.eu/resource/Concept/Q84263196
+# ("organization", "http://weverify.eu/resource/Organization/72b4f61c7cb49873004bea24f0a8f8f9"), # PolitifactFB
+# ("organization", "http://weverify.eu/resource/Organization/552abae8eb4e003e69a3351eb0eae372") # LeadStories
 
 # "documentTypes": "http://schema.org/Claim",
 DEFAULT_PARAMS = [
-    ("concept", "http://weverify.eu/resource/Concept/Q212"),
+    ("concept", "http://weverify.eu/resource/Concept/Q84263196"),
     ("from", "2000-01-01"),
     ("to", "2026-02-19"),
     ("lang", "en"),
     ("limit", 5000),
     ("page", 1),
     ("orderBy", "date"),
-
-    # duplicate keys allowed
-    ("organization", "http://weverify.eu/resource/Organization/3727f7b2aa90ec0716693e5464b28d18"), # StopFake
-    ("organization", "http://weverify.eu/resource/Organization/c71953fa6cf24ac4178f751c77862070"), # CheckYourFact
+    ("organization", "http://weverify.eu/resource/Organization/72b4f61c7cb49873004bea24f0a8f8f9"), # PolitifactFB
+    ("organization", "http://weverify.eu/resource/Organization/552abae8eb4e003e69a3351eb0eae372") # LeadStories
 ]
 
 NUM_RANDOM_CLAIMS = 20

@@ -1,7 +1,8 @@
 {
   "dependencies": ["."],
   "graphs": {
-    "agent": "./agent.ts:agent"
+    "agent": "./agent.ts:agent",
+    "verifier": "./verify.ts:agent"
   },
   "env": ".env"
 }

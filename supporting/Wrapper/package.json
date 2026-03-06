@@ -7,7 +7,8 @@
   "type": "commonjs",
   "main": "run.ts",
   "scripts": {
-    "dev": "npx tsx run.ts"
+    "dev": "npx tsx run.ts",
+    "rerank": "INPUT_FILE='../../data/rerank.jsonl' OUTPUT_FILE='../../data/reranked.jsonl' AGENT='verifier' MODE='verifier' npx tsx run.ts"
   },
   "dependencies": {
     "@langchain/langgraph-sdk": "^1.6.2",
