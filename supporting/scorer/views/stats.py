@@ -1,4 +1,6 @@
 from collections import Counter
+from pathlib import Path
+import json
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -27,22 +29,6 @@ def render():
                     words = extra.strip().split()
                     word_counter.update(words)
 
-                # ---- confidence classification ----
-                if score is not None:
-                    extra_lower = extra.strip().lower()
-
-                    if score > THRESH and extra_lower == "perfect":
-                        confidence_counter["Correct"] += 1
-
-                    elif score > THRESH and extra_lower != "perfect":
-                        confidence_counter["Over-confident"] += 1
-
-                    elif score < THRESH and extra_lower == "perfect":
-                        confidence_counter["Under-confident"] += 1
-
-                    else:
-                        confidence_counter["Other"] += 1
-
     # --------------------------
     # Extra Info Word Counts
     # --------------------------
@@ -62,24 +48,62 @@ def render():
     # --------------------------
     # Confidence vs Label Stats
     # --------------------------
-    st.subheader("Confidence vs Label Distribution")
+    st.header("Confidence vs Label Distribution per JSONL File")
 
-    if confidence_counter:
-        df_conf = pd.DataFrame(
-            confidence_counter.items(),
-            columns=["Category", "Count"]
-        )
+    path = Path("../../data/reranked")
 
-        fig, ax = plt.subplots()
-        ax.pie(
-            df_conf["Count"],
-            labels=df_conf["Category"],
-            autopct="%1.1f%%",
-            startangle=90
-        )
-        ax.axis("equal")
+    if not path.exists() or not path.is_dir():
+        st.error("Invalid folder path.")
+        return
 
-        st.pyplot(fig, width=500)
+    jsonl_files = list(path.glob("*.jsonl"))
+    if not jsonl_files:
+        st.info("No .jsonl files found in this folder.")
+        return
 
-    else:
-        st.info("No score data available yet.")
+    for file_path in jsonl_files:
+        st.subheader(f"File: {file_path.name}")
+
+        confidence_counter = Counter()
+
+        # ---- Read file line by line ----
+        with open(file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                try:
+                    entry = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+
+                for event in entry.get("events", []):
+                    score = event.get("score", None)
+                    extra_lower = (event.get("extra_info", "") or "").strip().lower()
+                    print(extra_lower)
+                    if score is not None:
+                        if score > THRESH and extra_lower == "perfect":
+                            confidence_counter["Correct"] += 1
+                        elif score > THRESH and extra_lower != "perfect":
+                            confidence_counter["Over-confident"] += 1
+                        elif score < THRESH and extra_lower == "perfect":
+                            confidence_counter["Under-confident"] += 1
+                        else:
+                            confidence_counter["Other"] += 1
+
+        if confidence_counter:
+            df_conf = pd.DataFrame(
+                confidence_counter.items(),
+                columns=["Category", "Count"]
+            )
+
+            fig, ax = plt.subplots()
+            ax.pie(
+                df_conf["Count"],
+                labels=df_conf["Category"],
+                autopct="%1.1f%%",
+                startangle=90
+            )
+            ax.axis("equal")
+            ax.set_title(file_path.name)
+
+            st.pyplot(fig, width=500)
+        else:
+            st.info("No score data available in this file.")

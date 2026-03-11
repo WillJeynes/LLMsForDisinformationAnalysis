@@ -6,6 +6,10 @@ uvicorn[standard]
 ragas
 datasets
 
+# ROBERTA
+scikit-learn
+transformers[torch]
+
 # Utils
 numpy
 pandas
