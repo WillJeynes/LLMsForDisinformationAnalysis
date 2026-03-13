@@ -6,17 +6,17 @@ from collections import Counter
 import sys
 import csv
 
-NUM_CLASSES = 3
+NUM_CLASSES = 2
 model_name = "roberta-base"
 
 LABEL_PRIORITY = [
     ("PERFECT", 0),
     ("STORY", 1),
-    ("NSPECIFIC", 2),
-    ("REWORDING", 2),
+    ("NSPECIFIC", 1),
+    ("REWORDING", 1),
     ("TINCORRECT", -1),
     ("DUPLICATE", -1),
-    ("", 2),  # fallback to PERFECT
+    ("", 0),  # fallback to PERFECT
 ]
 
 def label_to_int(extra_info: str) -> int:

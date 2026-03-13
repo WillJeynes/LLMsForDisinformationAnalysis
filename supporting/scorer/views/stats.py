@@ -56,7 +56,7 @@ def render():
         st.error("Invalid folder path.")
         return
 
-    jsonl_files = list(path.glob("*.jsonl"))
+    jsonl_files = sorted(path.glob("*.jsonl"))
     if not jsonl_files:
         st.info("No .jsonl files found in this folder.")
         return
@@ -80,13 +80,13 @@ def render():
                     print(extra_lower)
                     if score is not None:
                         if score > THRESH and extra_lower == "perfect":
-                            confidence_counter["Correct"] += 1
+                            confidence_counter["Correct-TRUE"] += 1
                         elif score > THRESH and extra_lower != "perfect":
                             confidence_counter["Over-confident"] += 1
                         elif score < THRESH and extra_lower == "perfect":
                             confidence_counter["Under-confident"] += 1
                         else:
-                            confidence_counter["Other"] += 1
+                            confidence_counter["Correct-FALSE"] += 1
 
         if confidence_counter:
             df_conf = pd.DataFrame(
@@ -104,6 +104,11 @@ def render():
             ax.axis("equal")
             ax.set_title(file_path.name)
 
+            total = sum(confidence_counter.values())
+            correct = confidence_counter["Correct-TRUE"] + confidence_counter["Correct-FALSE"]
+
+            corr_percent = (correct / total) * 100
+            st.markdown(f"**Correct: {corr_percent:.2f}% ({correct}/{total})**")
             st.pyplot(fig, width=500)
         else:
             st.info("No score data available in this file.")

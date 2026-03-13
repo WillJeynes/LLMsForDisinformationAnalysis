@@ -3,7 +3,7 @@ import { MessagesState } from "../state";
 import { BaseMessage } from "@langchain/core/messages";
 
 //TODO: Each of these might need different weights
-const keys = ["CONFIDENCE", "RAGAS", "RELATION"];
+const keys = ["CONFIDENCE", "RELATION", "RAGAS", "ROBERTA"];
 
 const mapping = {
   VERYHIGH: 1.0,
@@ -16,7 +16,7 @@ const mapping = {
 type Priority = keyof typeof mapping;
 
 function mapResponse(value: string | undefined | null): number {
-  if (!value) return 0;
+  if (!value) return 1;
 
   const trimmed = value.trim();
   const num = parseFloat(trimmed);

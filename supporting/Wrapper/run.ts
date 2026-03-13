@@ -102,7 +102,7 @@ function buildAgentInput(record: Claim | VerifierInput) {
       date: v.date,
       proposedTriggerEvent: v.events,
       normalizedClaim: v.normalizedClaim,
-      proposedTriggerEventIndex: 0
+      proposedTriggerEventIndex: -1
     };
   }
 
