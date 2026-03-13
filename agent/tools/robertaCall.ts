@@ -4,15 +4,15 @@ export async function evaluateWithRoberta({
   answer
 }: {
   answer: string;
-}) {
+}): Promise<{ validProb: number; invalidProb: number; }> {
   const res = await axios.post("http://localhost:8000/evaluate", {
     answer
   });
   // console.log(res.data)
   const validProb = res.data["probabilities"][0][0]
-  const invalidProv = res.data["probabilities"][0][1]
+  const invalidProb = res.data["probabilities"][0][1]
 
-  return validProb > invalidProv ? 1 : 0;
+  return {validProb, invalidProb};
 }
 
 // let res = await evaluateWithRoberta({answer: "High-profile political downplaying of COVID-19 (examples: President Trump saying 'it will go away' in March–August 2020)"});
