@@ -65,6 +65,9 @@ def render():
         st.subheader(f"File: {file_path.name}")
 
         confidence_counter = Counter()
+        overconfident_docs = []
+        underconfident_docs = []
+        dup_counter = 0
 
         # ---- Read file line by line ----
         with open(file_path, "r", encoding="utf-8") as f:
@@ -73,18 +76,24 @@ def render():
                     entry = json.loads(line)
                 except json.JSONDecodeError:
                     continue
-
+                doc_id = entry.get("documentUrl", "UNKNOWN")
                 for event in entry.get("events", []):
                     score = event.get("score", None)
                     extra_lower = (event.get("extra_info", "") or "").strip().lower()
-                    print(extra_lower)
+                    # print(extra_lower)
                     if score is not None:
-                        if score > THRESH and extra_lower == "perfect":
-                            confidence_counter["Correct-TRUE"] += 1
-                        elif score > THRESH and extra_lower != "perfect":
+                        if "duplicate" in extra_lower:
+                            dup_counter += 1
+                        elif score > THRESH and extra_lower == "perfect":
+                            confidence_counter["Correct-PERFECT"] += 1
+                        elif score > THRESH and extra_lower == "":
+                            confidence_counter["Correct-FINE"] += 1
+                        elif score > THRESH and extra_lower != "perfect" and extra_lower != "":
                             confidence_counter["Over-confident"] += 1
-                        elif score < THRESH and extra_lower == "perfect":
+                            overconfident_docs.append(doc_id)
+                        elif score < THRESH and (extra_lower == "perfect" or extra_lower == ""):
                             confidence_counter["Under-confident"] += 1
+                            underconfident_docs.append(doc_id)
                         else:
                             confidence_counter["Correct-FALSE"] += 1
 
@@ -105,10 +114,25 @@ def render():
             ax.set_title(file_path.name)
 
             total = sum(confidence_counter.values())
-            correct = confidence_counter["Correct-TRUE"] + confidence_counter["Correct-FALSE"]
+            correct = confidence_counter["Correct-PERFECT"] + confidence_counter["Correct-FINE"] + confidence_counter["Correct-FALSE"]
 
             corr_percent = (correct / total) * 100
             st.markdown(f"**Correct: {corr_percent:.2f}% ({correct}/{total})**")
+            st.markdown(f"Duplicates: {dup_counter}")
             st.pyplot(fig, width=500)
+
+            st.subheader("Over-Confident Document IDs")
+
+            if overconfident_docs:
+                st.container(height=200).write(sorted(set(overconfident_docs)))
+            else:
+                st.info("None")
+
+            st.subheader("Under-Confident Document IDs")
+
+            if underconfident_docs:
+                st.container(height=200).write(sorted(set(underconfident_docs)))
+            else:
+                st.info("None")
         else:
             st.info("No score data available in this file.")
