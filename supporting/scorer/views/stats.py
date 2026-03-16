@@ -18,16 +18,14 @@ def render():
 
     # ---- collect stats ----
     for entry in st.session_state.data:
-        for o in entry.get("output", []):
-            for c in o.get("content_parsed", []):
+        for c in entry.get("events", []):
+            # ---- extra_info word counts ----
+            extra = c.get("extra_info", "")
+            score = c.get("score", None)
 
-                # ---- extra_info word counts ----
-                extra = c.get("extra_info", "")
-                score = c.get("score", None)
-
-                if extra:
-                    words = extra.strip().split()
-                    word_counter.update(words)
+            if extra:
+                words = extra.strip().split()
+                word_counter.update(words)
 
     # --------------------------
     # Extra Info Word Counts

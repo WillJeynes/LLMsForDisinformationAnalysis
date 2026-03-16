@@ -1,7 +1,7 @@
 import random
 import streamlit as st
 from config import INPUT_FILE
-from data_utils import save_data
+from data_utils import save_data_clean
 
 
 def page_title() -> str:
@@ -15,10 +15,10 @@ def render():
         for entry in st.session_state.data:
             claims = []
 
-            for o in entry.get("output", []):
-                for c in o.get("content_parsed", []):
-                    if not c.get("ranked"):
-                        claims.append(c)
+
+            for c in entry.get("events", []):
+                if not c.get("ranked"):
+                    claims.append(c)
 
             if claims:
                 unannotated.append({"entry": entry, "claims": claims})
@@ -44,8 +44,8 @@ def render():
 
             with st.container(border=True):
 
-                st.markdown(f"**Event:** {c.get('event')}")
-                st.markdown(f"**Reasoning:** {c.get('reasoningWhyRelevant')}")
+                st.markdown(f"**Event:** {c.get('Event')}")
+                st.markdown(f"**Reasoning:** {c.get('ReasoningWhyRelevant')}")
 
                 cols = st.columns(7)
                 temp = ""
@@ -69,7 +69,7 @@ def render():
                 c["ranked"] = True
 
         if st.button("Save Annotation"):
-            save_data(INPUT_FILE, st.session_state.data)
+            save_data_clean(INPUT_FILE, st.session_state.data)
             st.session_state.current_claim = None
             print("Annotation saved")
             st.rerun()

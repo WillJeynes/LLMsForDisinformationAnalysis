@@ -5,19 +5,17 @@ import { createToolConditional } from "./conditionals/tool_end";
 import { normalizationSetup } from "./nodes/normalizationSetup";
 import { triggerEventToolsByName } from "./tools/triggerEventTools"
 import { verificationSetup } from "./nodes/verificationSetup";
-import { ragasMetrics } from "./nodes/ragasMetrics";
 import { produceRanking } from "./nodes/produceRanking";
 import { createModelNode } from "./nodes/model";
 import { loopEndConditional } from "./conditionals/loop_end";
 import { sort } from "./nodes/sort";
 import { triggerEventSetup } from "./nodes/triggerEventSetup";
+import { robertaMetrics } from "./nodes/robertaMetrics";
 
 const triggerEventToolNode = createToolNode(triggerEventToolsByName);
 
 const normalisationModel = createModelNode([], "normalization.txt");
 const triggerEventModel = createModelNode(triggerEventToolsByName, "trigger.txt");
-const verificationModel = createModelNode([], "verify.txt");
-const relationModel = createModelNode([], "relation.txt");
 
 const triggerEventToolConditional = createToolConditional("triggerEventToolNode", verificationSetup.name);
 
@@ -32,9 +30,7 @@ const agent = new StateGraph(MessagesState)
   .addNode("triggerEventModel", triggerEventModel)
 
   .addNode(verificationSetup.name, verificationSetup)
-  .addNode("verificationModel", verificationModel)
-  .addNode(ragasMetrics.name, ragasMetrics)
-  .addNode("relationModel", relationModel)
+  .addNode(robertaMetrics.name, robertaMetrics)
   
   .addNode(produceRanking.name, produceRanking)
   .addNode(sort.name, sort)
@@ -49,13 +45,9 @@ const agent = new StateGraph(MessagesState)
   .addConditionalEdges("triggerEventModel", triggerEventToolConditional, ["triggerEventToolNode", verificationSetup.name])
   .addEdge("triggerEventToolNode", "triggerEventModel")
   
-  .addEdge(verificationSetup.name, "verificationModel")
-  .addEdge(verificationSetup.name, ragasMetrics.name)
-  .addEdge(verificationSetup.name, "relationModel")
-
-  .addEdge(ragasMetrics.name, produceRanking.name)
-  .addEdge("verificationModel", produceRanking.name)
-  .addEdge("relationModel", produceRanking.name)
+  .addEdge(verificationSetup.name, robertaMetrics.name)
+  
+  .addEdge(robertaMetrics.name, produceRanking.name)
 
   // @ts-expect-error
   .addConditionalEdges(produceRanking.name, loopEndConditional, [verificationSetup.name, sort.name])
