@@ -10,7 +10,7 @@ export async function evaluateWithRoberta({
   });
   // console.log(res.data)
   const validProb = res.data["probabilities"][0][0]
-  const invalidProb = res.data["probabilities"][0][1]
+  const invalidProb = res.data["probabilities"][0][1] + res.data["probabilities"][0][2]
 
   return {validProb, invalidProb};
 }
@@ -19,4 +19,7 @@ export async function evaluateWithRoberta({
 // console.log(res)
 
 // res = await evaluateWithRoberta({answer: "Multiple mirrored reuploads (2020–2023) put the clip on other channels with titles implying it was a genuine 1970s public information film."});
+// console.log(res)
+
+// res = await evaluateWithRoberta({answer: "The COVID-19 Pandemic"});
 // console.log(res)

@@ -1,3 +1,5 @@
+from sklearn.utils import compute_class_weight
+from torch.nn import CrossEntropyLoss
 from transformers import RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments
 import torch
 from sklearn.model_selection import train_test_split
@@ -5,19 +7,35 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 from collections import Counter
 import sys
 import csv
+import numpy as np
 
-NUM_CLASSES = 2
+NUM_CLASSES = 3
 model_name = "roberta-base"
 
 LABEL_PRIORITY = [
     ("PERFECT", 0),
     ("STORY", 1),
-    ("NSPECIFIC", 1),
+    ("NSPECIFIC", 2),
     ("REWORDING", 1),
     ("TINCORRECT", -1),
     ("DUPLICATE", -1),
     ("", 0),  # fallback to PERFECT
 ]
+
+class WeightedTrainer(Trainer):
+    def __init__(self, *args, class_weights=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.class_weights = class_weights
+
+    def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
+        labels = inputs.get("labels")
+        outputs = model(**inputs)
+        logits = outputs.get("logits")
+
+        loss_fct = CrossEntropyLoss(weight=self.class_weights.to(logits.device))
+        loss = loss_fct(logits, labels)
+
+        return (loss, outputs) if return_outputs else loss
 
 def label_to_int(extra_info: str) -> int:
     """
@@ -90,9 +108,9 @@ def compute_metrics(eval_pred):
 
     return {
         "accuracy": accuracy_score(labels, preds),
-        "f1": f1_score(labels, preds, average="weighted"),
-        "precision": precision_score(labels, preds, average="weighted"),
-        "recall": recall_score(labels, preds, average="weighted"),
+        "f1": f1_score(labels, preds, average="weighted", zero_division=0),
+        "precision": precision_score(labels, preds, average="weighted", zero_division=0),
+        "recall": recall_score(labels, preds, average="weighted", zero_division=0),
     }
 
 texts, labels = load_dataset_from_csv("../../data/classify.csv")
@@ -106,7 +124,7 @@ model = RobertaForSequenceClassification.from_pretrained(
 for param in model.roberta.parameters():
     param.requires_grad = False
 
-for param in model.roberta.encoder.layer[-2:].parameters():
+for param in model.roberta.encoder.layer[-3:].parameters():
     param.requires_grad = True
 
 print("Dataset size:", len(texts))
@@ -119,6 +137,16 @@ train_texts, val_texts, train_labels, val_labels = train_test_split(
     test_size=0.2,
     random_state=42
 )
+
+
+class_weights = compute_class_weight(
+    class_weight="balanced",
+    classes=np.unique(train_labels),
+    y=train_labels
+)
+
+class_weights = torch.tensor(class_weights, dtype=torch.float)
+print("Class weights:", class_weights)
 
 train_encodings = tokenizer(
     train_texts,
@@ -160,19 +188,21 @@ training_args = TrainingArguments(
     eval_strategy="epoch",
     save_strategy="epoch",
     metric_for_best_model="f1",
-    greater_is_better=True
+    greater_is_better=True,
+    dataloader_pin_memory=False
 )
 
 train_dataset = TextDataset(train_encodings, train_labels)
 
 val_dataset = TextDataset(val_encodings, val_labels)
 
-trainer = Trainer(
+trainer = WeightedTrainer(
     model=model,
     args=training_args,
     train_dataset=train_dataset,
     eval_dataset=val_dataset,
-    compute_metrics=compute_metrics
+    compute_metrics=compute_metrics,
+    class_weights=class_weights
 )
 
 trainer.train()

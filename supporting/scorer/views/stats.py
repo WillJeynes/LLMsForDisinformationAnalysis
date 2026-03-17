@@ -63,6 +63,7 @@ def render():
         st.subheader(f"File: {file_path.name}")
 
         confidence_counter = Counter()
+        wrong_counter = Counter()
         overconfident_docs = []
         underconfident_docs = []
         dup_counter = 0
@@ -90,6 +91,7 @@ def render():
                             confidence_counter["Correct-FINE"] += 1
                         elif score > THRESH and extra_lower != "perfect" and extra_lower != "":
                             confidence_counter["Over-confident"] += 1
+                            wrong_counter[extra_lower] += 1
                             overconfident_docs.append(doc_id)
                         elif score < THRESH and (extra_lower == "perfect" or extra_lower == ""):
                             confidence_counter["Under-confident"] += 1
@@ -134,5 +136,12 @@ def render():
                 st.container(height=200).write(sorted(set(underconfident_docs)))
             else:
                 st.info("None")
+
+            df_words = (
+                pd.DataFrame(wrong_counter.items(), columns=["Label", "Count"])
+                .sort_values("Count", ascending=False)
+            )
+
+            st.dataframe(df_words)
         else:
             st.info("No score data available in this file.")
