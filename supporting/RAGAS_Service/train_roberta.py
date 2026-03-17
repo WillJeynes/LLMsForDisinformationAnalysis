@@ -113,104 +113,115 @@ def compute_metrics(eval_pred):
         "recall": recall_score(labels, preds, average="weighted", zero_division=0),
     }
 
-texts, labels = load_dataset_from_csv("../../data/classify.csv")
+def main():
+    torch.multiprocessing.set_start_method('fork')
+    print("CUDA available:", torch.cuda.is_available())
+    print("CUDA device count:", torch.cuda.device_count())
+    print("Current device:", torch.cuda.current_device() if torch.cuda.is_available() else "CPU")
+    texts, labels = load_dataset_from_csv("../../data/classify.csv")
 
-tokenizer = RobertaTokenizer.from_pretrained(model_name)
-model = RobertaForSequenceClassification.from_pretrained(
-    model_name,
-    num_labels=NUM_CLASSES
-)
+    tokenizer = RobertaTokenizer.from_pretrained(model_name)
+    model = RobertaForSequenceClassification.from_pretrained(
+        model_name,
+        num_labels=NUM_CLASSES
+    )
 
-for param in model.roberta.parameters():
-    param.requires_grad = False
+    for param in model.roberta.parameters():
+        param.requires_grad = False
 
-for param in model.roberta.encoder.layer[-3:].parameters():
-    param.requires_grad = True
+    for param in model.roberta.encoder.layer[-3:].parameters():
+        param.requires_grad = True
 
-print("Dataset size:", len(texts))
-print("Label distribution:")
-print(Counter(labels))
+    print("Dataset size:", len(texts))
+    print("Label distribution:")
+    print(Counter(labels))
 
-train_texts, val_texts, train_labels, val_labels = train_test_split(
-    texts,
-    labels,
-    test_size=0.2,
-    random_state=42
-)
+    train_texts, val_texts, train_labels, val_labels = train_test_split(
+        texts,
+        labels,
+        test_size=0.2,
+        random_state=42
+    )
 
 
-class_weights = compute_class_weight(
-    class_weight="balanced",
-    classes=np.unique(train_labels),
-    y=train_labels
-)
+    class_weights = compute_class_weight(
+        class_weight="balanced",
+        classes=np.unique(train_labels),
+        y=train_labels
+    )
 
-class_weights = torch.tensor(class_weights, dtype=torch.float)
-print("Class weights:", class_weights)
+    class_weights = torch.tensor(class_weights, dtype=torch.float)
+    print("Class weights:", class_weights)
 
-train_encodings = tokenizer(
-    train_texts,
-    truncation=True,
-    padding=True,
-    max_length=256
-)
+    train_encodings = tokenizer(
+        train_texts,
+        truncation=True,
+        padding=True,
+        max_length=256
+    )
 
-val_encodings = tokenizer(
-    val_texts,
-    truncation=True,
-    padding=True,
-    max_length=256
-)
+    val_encodings = tokenizer(
+        val_texts,
+        truncation=True,
+        padding=True,
+        max_length=256
+    )
 
-class TextDataset(torch.utils.data.Dataset):
-    def __init__(self, encodings, labels):
-        self.encodings = encodings
-        self.labels = labels
+    class TextDataset(torch.utils.data.Dataset):
+        def __init__(self, encodings, labels):
+            self.encodings = encodings
+            self.labels = labels
 
-    def __getitem__(self, idx):
-        item = {
-            key: torch.tensor(val[idx])
-            for key, val in self.encodings.items()
-        }
-        item["labels"] = torch.tensor(self.labels[idx])
-        return item
+        def __getitem__(self, idx):
+            item = {
+                key: torch.tensor(val[idx])
+                for key, val in self.encodings.items()
+            }
+            item["labels"] = torch.tensor(self.labels[idx])
+            return item
 
-    def __len__(self):
-        return len(self.labels)
+        def __len__(self):
+            return len(self.labels)
 
-training_args = TrainingArguments(
-    output_dir="./results",
-    learning_rate=1e-5,
-    per_device_train_batch_size=8,
-    num_train_epochs=15,
-    weight_decay=0.01,
-    load_best_model_at_end=True,
-    eval_strategy="epoch",
-    save_strategy="epoch",
-    metric_for_best_model="f1",
-    greater_is_better=True,
-    dataloader_pin_memory=False
-)
+    training_args = TrainingArguments(
+        output_dir="./results",
+        learning_rate=1e-5,
+        per_device_train_batch_size=8,
+        num_train_epochs=15,
+        weight_decay=0.01,
+        load_best_model_at_end=True,
+        eval_strategy="epoch",
+        save_strategy="epoch",
+        metric_for_best_model="f1",
+        greater_is_better=True,
+        dataloader_num_workers=4,
+        dataloader_pin_memory=True
+    )
 
-train_dataset = TextDataset(train_encodings, train_labels)
+    train_dataset = TextDataset(train_encodings, train_labels)
 
-val_dataset = TextDataset(val_encodings, val_labels)
+    val_dataset = TextDataset(val_encodings, val_labels)
 
-trainer = WeightedTrainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset,
-    eval_dataset=val_dataset,
-    compute_metrics=compute_metrics,
-    class_weights=class_weights
-)
+    trainer = WeightedTrainer(
+        model=model,
+        args=training_args,
+        train_dataset=train_dataset,
+        eval_dataset=val_dataset,
+        compute_metrics=compute_metrics,
+        class_weights=class_weights
+    )
 
-trainer.train()
+    trainer.train()
 
-metrics = trainer.evaluate()
-print("Final evaluation metrics:")
-for k, v in metrics.items():
-    print(f"{k}: {v}")
+    metrics = trainer.evaluate()
+    print("Final evaluation metrics:")
+    for k, v in metrics.items():
+        print(f"{k}: {v}")
 
-trainer.save_model("./roberta_classifier")
-tokenizer.save_pretrained("./roberta_classifier")
+    trainer.save_model("./roberta_classifier")
+    tokenizer.save_pretrained("./roberta_classifier")
+
+
+
+if __name__ == "__main__":
+    main()
