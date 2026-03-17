@@ -17,7 +17,7 @@ def render():
 
 
             for c in entry.get("events", []):
-                if not c.get("ranked"):
+                if not c.get("ranked") and c.get("score") != -1:
                     claims.append(c)
 
             if claims:
@@ -62,7 +62,7 @@ def render():
 
                 for i, (name, tag) in enumerate(labels):
                     with cols[i]:
-                        if st.checkbox(name, key=f"{tag}{idx}{c.get('event')}"):
+                        if st.checkbox(name, key=f"{tag}{idx}{c.get('Event')}"):
                             temp += tag + " "
 
                 c["extra_info"] = temp.strip()

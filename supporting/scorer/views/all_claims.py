@@ -7,7 +7,7 @@ def render():
     st.header("All Claims")
     for entry in st.session_state.data:
         st.subheader(entry.get("text"))
-
+        st.markdown(f"\"{entry.get('documentUrl')}\"")
         for c in entry.get("events", []):
             st.markdown(f"**Event:** {c.get('Event')}")
             st.markdown(f"**Reasoning:** {c.get('ReasoningWhyRelevant')}")

@@ -82,6 +82,8 @@ def render():
                     if score is not None:
                         if score == -1 or "duplicate" in extra_lower:
                             dup_counter += 1
+                        elif "ranked" not in event:
+                            "ignore for now"
                         elif score > THRESH and extra_lower == "perfect":
                             confidence_counter["Correct-PERFECT"] += 1
                         elif score > THRESH and extra_lower == "":
