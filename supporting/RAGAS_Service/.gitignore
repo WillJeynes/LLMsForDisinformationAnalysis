@@ -2,6 +2,7 @@
 results/
 roberta_classifier/
 roberta_classifier*/
+output*
 
 # -- THEIRS --
 # Byte-compiled / optimized / DLL files

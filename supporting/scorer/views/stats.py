@@ -118,8 +118,14 @@ def render():
             total = sum(confidence_counter.values())
             correct = confidence_counter["Correct-PERFECT"] + confidence_counter["Correct-FINE"] + confidence_counter["Correct-FALSE"]
 
+            goodkept = confidence_counter["Correct-PERFECT"] + confidence_counter["Correct-FINE"]
+            allkept = confidence_counter["Correct-PERFECT"] + confidence_counter["Correct-FINE"] + confidence_counter["Over-confident"]
+
+
             corr_percent = (correct / total) * 100
+            kept_percent = (goodkept / allkept) * 100
             st.markdown(f"**Correct: {corr_percent:.2f}% ({correct}/{total})**")
+            st.markdown(f"**Kept: {kept_percent:.2f}% ({goodkept}/{allkept})**")
             st.markdown(f"Duplicates: {dup_counter}")
             st.pyplot(fig, width=500)
 

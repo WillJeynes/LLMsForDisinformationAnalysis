@@ -120,7 +120,7 @@ def main():
     print("Current device:", torch.cuda.current_device() if torch.cuda.is_available() else "CPU")
     texts, labels = load_dataset_from_csv("../../data/classify.csv")
 
-    tokenizer = RobertaTokenizer.from_pretrained(model_name)
+    tokenizer = RobertaTokenizer.from_pretrained(model_name, hidden_dropout_prob=0.2,attention_probs_dropout_prob=0.2)
     model = RobertaForSequenceClassification.from_pretrained(
         model_name,
         num_labels=NUM_CLASSES
@@ -129,13 +129,13 @@ def main():
     for param in model.roberta.parameters():
         param.requires_grad = False
 
-    for param in model.roberta.encoder.layer[-3:].parameters():
+    for param in model.roberta.encoder.layer[-6:].parameters():
         param.requires_grad = True
 
     print("Dataset size:", len(texts))
     print("Label distribution:")
     print(Counter(labels))
-
+    
     train_texts, val_texts, train_labels, val_labels = train_test_split(
         texts,
         labels,
@@ -185,9 +185,9 @@ def main():
 
     training_args = TrainingArguments(
         output_dir="./results",
-        learning_rate=1e-5,
-        per_device_train_batch_size=8,
-        num_train_epochs=15,
+        learning_rate=2e-5,
+        per_device_train_batch_size=32,
+        num_train_epochs=5,
         weight_decay=0.01,
         load_best_model_at_end=True,
         eval_strategy="epoch",
