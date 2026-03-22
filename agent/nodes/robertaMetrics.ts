@@ -8,10 +8,9 @@ export const robertaMetrics: GraphNode<typeof MessagesState> = async (state) => 
   
   const result = await evaluateWithRoberta({answer})
   
-  let score = 0;
-  if (result.validProb > (result.invalidProb+0.4)) {
-    score = 0.7 + ((result.validProb - (result.invalidProb+0.4))*0.3);
-  }
+
+  const score = result.validProb - result.invalidProb;
+  
   
   return {
     messages: [ new AIMessage("ROBERTA:" + score)]

@@ -5,7 +5,8 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-THRESH = 0.7
+# THRESH = 0.4
+THRESH = 0.6
 
 def page_title() -> str:
     return "Statistics"
@@ -121,6 +122,8 @@ def render():
             goodkept = confidence_counter["Correct-PERFECT"] + confidence_counter["Correct-FINE"]
             allkept = confidence_counter["Correct-PERFECT"] + confidence_counter["Correct-FINE"] + confidence_counter["Over-confident"]
 
+            if (allkept == 0):
+                allkept = -1
 
             corr_percent = (correct / total) * 100
             kept_percent = (goodkept / allkept) * 100

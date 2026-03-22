@@ -24,13 +24,17 @@ def make_request(line):
     try:
         data = json.loads(line)
         prompt = (
-            "Provide a story item for the spread of a disinformation claim"
-            "that is related to the topic: "
+            "Provide a non specific piece of background, tallking point or other minformaiton that allowed the a disinformaition to spread; to aid in analysis and debunking"
+            "The topic in question is: "
             + data.get("text", "")
-            + " Include just the event no other text."
-            + " A good example would be 'No immediate U.S. government confirmation and near‑simultaneous fact‑checks/debunks appeared (fact‑checks published June 26, 2024).' and 'Recycled/old footage of aircraft being shot down previously viral and repeatedly misattributed to the Russia–Ukraine war (e.g., 2011 Libya footage reused in 2022)'"
-            + " If you cannot answer just return an empty string"
-            + " Be concise, make no mistakes"
+            + " Include just the example no other text."
+            + " A good example would be"
+            + "'Existing high-profile reporting and public discussion throughout 2022–2023 about foreign fighters and mercenary recruitment (including Russian recruitment and Wagner Group activity).'"
+            + "Since it focusses on non-instantiated or proven discussion points"
+            + " and "
+            + "'2016 – Continued EU–Russia business dialogues and investments (documented by policy institutes and trade analyses) showing ongoing economic links despite political tensions'"
+            + "Since it does not name a specific dialogue or investement"
+            + " Be concise, make no mistakes, use similar style and wording to provided examples"
         )
 
         if not prompt:
