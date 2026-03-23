@@ -10,7 +10,7 @@ import csv
 import numpy as np
 
 NUM_CLASSES = 3
-model_name = "microsoft/deberta-v3-base"
+model_name = "distilbert/distilroberta-base"
 
 LABEL_PRIORITY = [
     ("PERFECT", 0),
@@ -29,19 +29,20 @@ class WeightedTrainer(Trainer):
 
     def compute_loss(self, model, inputs, return_outputs=False, **kwargs):
         labels = inputs.get("labels")
-        print("Before forward")
+        # print("DBG: Before forward")
         outputs = model(**inputs)
-        print("After forward")
+        # print("DBG: After forward")
         logits = outputs.get("logits")
 
         # loss_fct = CrossEntropyLoss(weight=self.class_weights.to(logits.device))
-        loss_fct = CrossEntropyLoss(
-            weight=self.class_weights.to(logits.device).to(logits.dtype)
-        )
-        print("Before loss")
+        # loss_fct = CrossEntropyLoss(
+        #     weight=self.class_weights.to(logits.device).to(logits.dtype)
+        # )
+        loss_fct = CrossEntropyLoss()
+        # print("DBG: Before loss")
         loss = loss_fct(logits, labels)
         # loss.backward()
-        print("After loss")
+        # print("DBG: After loss")
         return (loss, outputs) if return_outputs else loss
 
 def label_to_int(extra_info: str) -> int:
@@ -121,7 +122,7 @@ def compute_metrics(eval_pred):
     }
 
 def main():
-    # torch.multiprocessing.set_start_method('fork')
+    torch.multiprocessing.set_start_method('fork')
     print("CUDA available:", torch.cuda.is_available())
     print("CUDA device count:", torch.cuda.device_count())
     print("Current device:", torch.cuda.current_device() if torch.cuda.is_available() else "CPU")
@@ -139,11 +140,11 @@ def main():
         num_labels=NUM_CLASSES
     )
 
-    for param in model.deberta.parameters():
-        param.requires_grad = False
+    # for param in model.deberta.parameters():
+    #     param.requires_grad = True
 
-    for param in model.deberta.encoder.layer[-1:].parameters():
-        param.requires_grad = True
+    # for param in model.deberta.encoder.layer[-6:].parameters():
+    #     param.requires_grad = True
 
     print("Dataset size:", len(texts))
     print("Label distribution:")
@@ -153,7 +154,8 @@ def main():
         texts,
         labels,
         test_size=0.2,
-        random_state=42
+        random_state=42,
+        stratify=labels
     )
 
 
@@ -170,14 +172,14 @@ def main():
         train_texts,
         truncation=True,
         padding=True,
-        max_length=256
+        max_length=512
     )
 
     val_encodings = tokenizer(
         val_texts,
         truncation=True,
         padding=True,
-        max_length=256
+        max_length=512
     )
 
     class TextDataset(torch.utils.data.Dataset):
@@ -186,7 +188,7 @@ def main():
             self.labels = labels
 
         def __getitem__(self, idx):
-            print(f"Loading item {idx}")
+            # print(f"DBG: Loading item {idx}")
             item = {
                 key: torch.tensor(val[idx])
                 for key, val in self.encodings.items()
@@ -200,8 +202,9 @@ def main():
     training_args = TrainingArguments(
         output_dir="./results",
         learning_rate=2e-5,
-        per_device_train_batch_size=32,
-        num_train_epochs=5,
+        per_device_train_batch_size=16,
+        gradient_accumulation_steps=2,
+        num_train_epochs=10,
         weight_decay=0.01,
         load_best_model_at_end=True,
         eval_strategy="epoch",
@@ -209,7 +212,8 @@ def main():
         metric_for_best_model="f1",
         greater_is_better=True,
         dataloader_num_workers=4,
-        dataloader_pin_memory=True
+        dataloader_pin_memory=True,
+        # warmup_steps=100,
     )
 
     train_dataset = TextDataset(train_encodings, train_labels)
