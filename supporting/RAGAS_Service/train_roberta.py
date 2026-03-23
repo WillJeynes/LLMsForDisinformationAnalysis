@@ -35,10 +35,11 @@ class WeightedTrainer(Trainer):
         logits = outputs.get("logits")
 
         # loss_fct = CrossEntropyLoss(weight=self.class_weights.to(logits.device))
-        # loss_fct = CrossEntropyLoss(
-        #     weight=self.class_weights.to(logits.device).to(logits.dtype)
-        # )
-        loss_fct = CrossEntropyLoss()
+        loss_fct = CrossEntropyLoss(
+            weight=self.class_weights.to(logits.device).to(logits.dtype)
+        )
+        # loss_fct = CrossEntropyLoss()
+        
         # print("DBG: Before loss")
         loss = loss_fct(logits, labels)
         # loss.backward()
@@ -172,14 +173,14 @@ def main():
         train_texts,
         truncation=True,
         padding=True,
-        max_length=512
+        max_length=256
     )
 
     val_encodings = tokenizer(
         val_texts,
         truncation=True,
         padding=True,
-        max_length=512
+        max_length=256
     )
 
     class TextDataset(torch.utils.data.Dataset):
@@ -202,9 +203,9 @@ def main():
     training_args = TrainingArguments(
         output_dir="./results",
         learning_rate=2e-5,
-        per_device_train_batch_size=16,
-        gradient_accumulation_steps=2,
-        num_train_epochs=10,
+        per_device_train_batch_size=32,
+        # gradient_accumulation_steps=2,
+        num_train_epochs=15,
         weight_decay=0.01,
         load_best_model_at_end=True,
         eval_strategy="epoch",
@@ -236,8 +237,8 @@ def main():
     for k, v in metrics.items():
         print(f"{k}: {v}")
 
-    trainer.save_model("./roberta_classifier")
-    tokenizer.save_pretrained("./roberta_classifier")
+    trainer.save_model("./roberta_distilled_classifier")
+    tokenizer.save_pretrained("./roberta_distilled_classifier")
 
 
 
