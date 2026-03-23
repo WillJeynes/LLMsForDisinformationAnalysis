@@ -5,7 +5,6 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# THRESH = 0.4
 THRESH = 0.6
 
 def page_title() -> str:
@@ -61,6 +60,10 @@ def render():
         return
 
     for file_path in jsonl_files:
+        thresh = THRESH
+        if ("flan" in file_path.name):
+            thresh = 0.94
+
         st.subheader(f"File: {file_path.name}")
 
         confidence_counter = Counter()
@@ -86,15 +89,15 @@ def render():
                             dup_counter += 1
                         elif "ranked" not in event:
                             "ignore for now"
-                        elif score > THRESH and extra_lower == "perfect":
+                        elif score > thresh and extra_lower == "perfect":
                             confidence_counter["Correct-PERFECT"] += 1
-                        elif score > THRESH and extra_lower == "":
+                        elif score > thresh and extra_lower == "":
                             confidence_counter["Correct-FINE"] += 1
-                        elif score > THRESH and extra_lower != "perfect" and extra_lower != "":
+                        elif score > thresh and extra_lower != "perfect" and extra_lower != "":
                             confidence_counter["Over-confident"] += 1
                             wrong_counter[extra_lower] += 1
                             overconfident_docs.append(doc_id)
-                        elif score < THRESH and (extra_lower == "perfect" or extra_lower == ""):
+                        elif score < thresh and (extra_lower == "perfect" or extra_lower == ""):
                             confidence_counter["Under-confident"] += 1
                             underconfident_docs.append(doc_id)
                         else:

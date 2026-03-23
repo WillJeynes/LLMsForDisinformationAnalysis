@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-MODEL_PATH = "./roberta_classifier"
+MODEL_PATH = "WillJeynes/LLMsForDisinformationAnalysis"
 
 tokenizer = RobertaTokenizer.from_pretrained(MODEL_PATH)
 model = RobertaForSequenceClassification.from_pretrained(MODEL_PATH)
