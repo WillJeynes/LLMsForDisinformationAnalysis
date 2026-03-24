@@ -64,7 +64,7 @@ def render():
         if ("flan" in file_path.name):
             thresh = 0.94
         if ("regression" in file_path.name):
-            thresh = 0.7
+            thresh = 0.75
 
         st.subheader(f"File: {file_path.name}")
 

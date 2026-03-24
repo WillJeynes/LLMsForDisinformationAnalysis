@@ -14,8 +14,8 @@ import sys
 NUM_CLASSES    = 3
 EMBEDDING_MODEL = "all-mpnet-base-v2"
 HIDDEN_DIM     = 256
-DROPOUT        = 0.3
-LEARNING_RATE  = 1e-3
+DROPOUT        = 0.4
+LEARNING_RATE  = 2e-3
 WEIGHT_DECAY   = 1e-4
 BATCH_SIZE     = 64
 NUM_EPOCHS     = 30
@@ -89,8 +89,6 @@ class LogisticNet(nn.Module):
     def forward(self, x):
         return self.net(x)
 
-
-# ── Metrics ───────────────────────────────────────────────────────────────────
 
 def evaluate(model, loader, device):
     model.eval()
