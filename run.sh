@@ -8,10 +8,10 @@ run_agent () {
     npx @langchain/langgraph-cli dev
 }
 
-run_ragas_service () {
-    echo "Starting RAGAS service..."
+run_ensemble_service () {
+    echo "Starting Ensemble service..."
     cd "supporting/RAGAS_Service"
-    .venv/bin/uvicorn ragas_service:app --port 8001
+    .venv/bin/uvicorn ensemble_service:app --timeout-keep-alive 300
 }
 
 run_frontend () {
@@ -34,13 +34,13 @@ run_wrapper () {
 
 case "$1" in
     agent) run_agent ;;
-    ragas_service) run_ragas_service ;;
+    ensemble_service) run_ensemble_service ;;
     frontend) run_frontend ;;
     fetch) run_fetch ;;
     wrapper) run_wrapper ;;
     *)
         echo "Unknown command: $1"
-        echo "Usage: ./runproject [agent|ragas_service|frontend|fetch|wrapper]"
+        echo "Usage: ./runproject [agent|ensemble_service|frontend|fetch|wrapper]"
         exit 1
         ;;
 esac
