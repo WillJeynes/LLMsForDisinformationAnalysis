@@ -3,6 +3,7 @@ results/
 roberta_classifier/
 roberta_distilled_classifier/
 roberta_classifier*/
+*.pt
 output*
 
 # -- THEIRS --
