@@ -17,7 +17,7 @@ const AGENT_NAME = process.env.AGENT ?? "agent";
  */
 const MODE = process.env.MODE ?? "claim";
 
-const MAX_CONCURRENCY = 1;
+const MAX_CONCURRENCY = 5;
 
 const client = new Client({ apiUrl: API_URL });
 

@@ -102,6 +102,11 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 flan_model.to(device)
 flan_model.eval()
 
+label_token_ids = {
+    label: flan_tokenizer(label, add_special_tokens=False).input_ids[0]
+    for label in LABEL_TO_INT.keys()
+}
+
 
 def format_prompt(text: str) -> str:
     return (
@@ -203,11 +208,6 @@ def evaluate(req: EvalRequest):
             outputs[0],
             skip_special_tokens=True
         )
-
-        label_token_ids = {
-            label: flan_tokenizer(label, add_special_tokens=False).input_ids[0]
-            for label in LABEL_TO_INT.keys()
-        }
 
         label_logits = torch.tensor(
             [logits[0, tid].item() for tid in label_token_ids.values()]
