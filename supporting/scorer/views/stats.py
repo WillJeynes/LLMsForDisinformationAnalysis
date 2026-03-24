@@ -69,6 +69,8 @@ def render():
             thresh = 0.1
         if ("ensemble" in file_path.name and "2" in file_path.name):
             thresh = 0.4
+        if ("ensemble" in file_path.name and "vot" in file_path.name):
+            thresh = 0.7
 
         st.subheader(f"File: {file_path.name}")
 
