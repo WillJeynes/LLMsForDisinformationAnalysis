@@ -10,7 +10,7 @@ import { createModelNode } from "./nodes/model";
 import { loopEndConditional } from "./conditionals/loop_end";
 import { sort } from "./nodes/sort";
 import { triggerEventSetup } from "./nodes/triggerEventSetup";
-import { robertaMetrics } from "./nodes/robertaMetrics";
+import { createEnsembleNode } from "./nodes/ensembleNode";
 
 const triggerEventToolNode = createToolNode(triggerEventToolsByName);
 
@@ -18,6 +18,10 @@ const normalisationModel = createModelNode([], "normalization.txt");
 const triggerEventModel = createModelNode(triggerEventToolsByName, "trigger.txt");
 
 const triggerEventToolConditional = createToolConditional("triggerEventToolNode", verificationSetup.name);
+
+const roNode = createEnsembleNode("ROBERTA", "roberta");
+const flNode = createEnsembleNode("FLAN", "flan");
+const lrNode = createEnsembleNode("REGRESSION", "logreg");
 
 const agent = new StateGraph(MessagesState)
   
@@ -30,7 +34,10 @@ const agent = new StateGraph(MessagesState)
   .addNode("triggerEventModel", triggerEventModel)
 
   .addNode(verificationSetup.name, verificationSetup)
-  .addNode(robertaMetrics.name, robertaMetrics)
+
+  .addNode("roNode", roNode)
+  .addNode("flNode", flNode)
+  .addNode("lrNode", lrNode)
   
   .addNode(produceRanking.name, produceRanking)
   .addNode(sort.name, sort)
@@ -45,9 +52,13 @@ const agent = new StateGraph(MessagesState)
   .addConditionalEdges("triggerEventModel", triggerEventToolConditional, ["triggerEventToolNode", verificationSetup.name])
   .addEdge("triggerEventToolNode", "triggerEventModel")
   
-  .addEdge(verificationSetup.name, robertaMetrics.name)
+  .addEdge(verificationSetup.name, "roNode")
+  .addEdge(verificationSetup.name, "flNode")
+  .addEdge(verificationSetup.name, "lrNode")
   
-  .addEdge(robertaMetrics.name, produceRanking.name)
+  .addEdge("roNode", produceRanking.name)
+  .addEdge("flNode", produceRanking.name)
+  .addEdge("lrNode", produceRanking.name)
 
   // @ts-expect-error
   .addConditionalEdges(produceRanking.name, loopEndConditional, [verificationSetup.name, sort.name])

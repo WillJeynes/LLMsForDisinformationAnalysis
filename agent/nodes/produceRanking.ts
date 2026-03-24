@@ -2,31 +2,25 @@ import { GraphNode } from "@langchain/langgraph";
 import { MessagesState } from "../state";
 import { BaseMessage } from "@langchain/core/messages";
 
-//TODO: Each of these might need different weights
-const keys = ["CONFIDENCE", "RELATION", "RAGAS", "ROBERTA"];
-
-const mapping = {
-  VERYHIGH: 1.0,
-  HIGH: 0.75,
-  MEDIUM: 0.5,
-  LOW: 0.25,
-  VERYLOW: 0.0,
+const models = {
+  REGRESSION: 0.3,
+  ROBERTA: 0.5,
+  FLAN: 0.3,
 } as const;
 
-type Priority = keyof typeof mapping;
+type ModelKey = keyof typeof models;
 
 function mapResponse(value: string | undefined | null): number {
-  if (!value) return 1;
+  if (!value) return 0;
 
   const trimmed = value.trim();
   const num = parseFloat(trimmed);
 
-  // If number, return it
-  if (!isNaN(num)) return num;
-
-  // Otherwise, map to value
-  const upper = trimmed.toUpperCase() as Priority;
-  return mapping[upper] ?? 0;
+  if (!isNaN(num)) {
+    return num;
+  } else {
+    return 0;
+  }
 }
 
 function getLastMessageContaining(
@@ -43,15 +37,15 @@ function getLastMessageContaining(
 }
 
 export const produceRanking: GraphNode<typeof MessagesState> = async (state) => {
-  // Extract and map values
-  const values = keys.map((key) => {
+  const values = (Object.keys(models) as ModelKey[]).map((key) => {
     const msg = getLastMessageContaining(state.messages, key);
     const part = msg?.split(":").at(1);
-    return mapResponse(part);
+    const baseValue = mapResponse(part);
+
+    return baseValue * models[key];
   });
 
-  // Multiply!
-  const result = values.reduce((acc, val) => acc * val, 1);
+  const result = values.reduce((acc, val) => acc + val, 0);
 
   const current = state.proposedTriggerEvent;
   current[state.proposedTriggerEventIndex].score = result;

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export async function evaluateWithRoberta({
+export async function evaluateWithEnsemble({
   answer,
   method
 }: {
@@ -10,7 +10,7 @@ export async function evaluateWithRoberta({
   const res = await axios.post("http://localhost:8000/evaluate", {
     answer,
     method
-  });
+  }, {timeout: 0});
   // console.log(res.data)
   const validProb = res.data["probabilities"][0][0]
   const invalidProb = res.data["probabilities"][0][1] + res.data["probabilities"][0][2]
