@@ -1,12 +1,15 @@
 import axios from "axios";
 
 export async function evaluateWithRoberta({
-  answer
+  answer,
+  method
 }: {
   answer: string;
+  method: string
 }): Promise<{ validProb: number; invalidProb: number; }> {
   const res = await axios.post("http://localhost:8000/evaluate", {
-    answer
+    answer,
+    method
   });
   // console.log(res.data)
   const validProb = res.data["probabilities"][0][0]

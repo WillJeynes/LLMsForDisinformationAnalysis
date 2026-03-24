@@ -65,6 +65,10 @@ def render():
             thresh = 0.94
         if ("regression" in file_path.name):
             thresh = 0.75
+        if ("ensemble" in file_path.name):
+            thresh = 0.1
+        if ("ensemble" in file_path.name and "2" in file_path.name):
+            thresh = 0.4
 
         st.subheader(f"File: {file_path.name}")
 
