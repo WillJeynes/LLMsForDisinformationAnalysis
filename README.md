@@ -11,7 +11,7 @@ Final Dissertation Submission Repository
 [See RAGAS_Service](/supporting/RAGAS_Service/)
 
 ## Agent Refinement
-[See agent](/supporting/agent/)
+[See agent](/agent/)
 
 ## Generated Database Link and Usage Experiments
 -- todo --
