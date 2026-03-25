@@ -1,3 +1,15 @@
+# Classifier work for evaluating model quality
+
+Made using a dataset of 1000 labeled claims from MVP pipeline.
+
+Roberta model trained on an augmented dataset with LLM generated adversarial examples for low frequency labels.
+
+Flan model trained using raw labelled claims, inherrent natural language ability allows for pattern recognition without the need for fake data.
+
+Regression model trained using the roberta dataset.
+
+Used ensemble model in the final version, with the component models available on Hugging Face. 
+
 | Model                                                      | % Correct | % Valid taken forward|Used in ensemble|Link
 |------------------------------------------------------------|-----------|----------------------|----------------|-
 | Original                                                   | 53.22     | 61.72                |

@@ -15,10 +15,11 @@ export const verificationSetup: GraphNode<typeof MessagesState> = async (state) 
 
     for (let i = 0; i < parsed.length; i++) {
       const search = parsed[i].SearchQuery
-      const data = await queryScraper(search);
-      const output = await rankAndDisplayData(data, search);
+      // const data = await queryScraper(search);
+      // const output = await rankAndDisplayData(data, search);
 
-      parsed[i].context = output;
+      // parsed[i].context = output;
+      parsed[i].context = "NONE"
     }
     
     return { proposedTriggerEvent: parsed, proposedTriggerEventIndex: 0 };

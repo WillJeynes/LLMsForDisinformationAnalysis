@@ -16,18 +16,18 @@ BASE_URL = "https://dbkf.ontotext.com/rest-api/search/documents"
 
 # "documentTypes": "http://schema.org/Claim",
 DEFAULT_PARAMS = [
-    ("concept", "http://weverify.eu/resource/Concept/Q212"),
+    ("documentTypes", "http://schema.org/Claim"),
     ("from", "2000-01-01"),
     ("to", "2026-02-19"),
     ("lang", "en"),
-    ("limit", 5000),
+    ("limit", 7000),
     ("page", 1),
     ("orderBy", "date"),
+    ("organization", "http://weverify.eu/resource/Organization/128573c5d49d37558706194e755f152d"), # Science Direct
     ("organization", "http://weverify.eu/resource/Organization/3727f7b2aa90ec0716693e5464b28d18"), # StopFake
-    ("organization", "http://weverify.eu/resource/Organization/c71953fa6cf24ac4178f751c77862070"), # CheckYourFact
 ]
 
-NUM_RANDOM_CLAIMS = 40
+NUM_RANDOM_CLAIMS = 200
 
 INPUT_FILE = "../../data/input.jsonl"
 OUTPUT_FILE = "../../data/claims.json"

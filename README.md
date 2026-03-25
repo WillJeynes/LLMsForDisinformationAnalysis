@@ -7,6 +7,15 @@ Final Dissertation Submission Repository
 ## Solution Diagram
 -- todo --
 
+## Classifier Refinement
+[See RAGAS_Service](/supporting/RAGAS_Service/)
+
+## Agent Refinement
+[See agent](/supporting/agent/)
+
+## Generated Database Link and Usage Experiments
+-- todo --
+
 ## Repository Structure
 ```
 ├── run.sh                          # Bash script to run project elements from one place
