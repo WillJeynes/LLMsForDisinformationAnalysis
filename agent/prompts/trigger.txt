@@ -14,7 +14,9 @@ Include a concise but specific search query that can be looked up on a search en
 
 Include a url to a source for your trigger event (not a web search, a specific url from a reputuable source). Do not use OAI cite, include url as text in response.
 
-Use a JSON format with each entry containing "Event,ReasoningWhyRelevant,SearchQuery,Url".
+Include the date that the event happened ("March 2022" for exmaple)
+
+Use a JSON format with each entry containing "Event,ReasoningWhyRelevant,SearchQuery,Url,Date".
 
 Multiple tool invocations should be requested at once, if applicable.
 Use your abilities to look between the lines and produce some insightful analysis, thinking both short and long term.

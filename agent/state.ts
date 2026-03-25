@@ -9,6 +9,7 @@ export const ProposedTriggerEvent = z.object({
   ReasoningWhyRelevant: z.string(),
   SearchQuery: z.string(),
   Url: z.url(),
+  Date: z.string(),
   context: z.string().optional(),
   score: z.number().optional()
 })
