@@ -26,4 +26,8 @@ Events will be reordered as part of processing, each statement must stand alone
 The preceeding messages act as examples of previous responses to potentially ficitonal events and scores given.
 Analysis should only be completed for proposed events that would graner >0.7 points
 
+First, consider a range of directions in which the proposed disinformation could have been influenced by.
+Then, research these directions in turn, using the tools at hand.
+Finally, refine your proposed "trigger event" until it is specific, quantifiable and backed up by evidence.
+
 Lets go through it step by step
