@@ -15,6 +15,8 @@ const CACHE_PATH = "../data/csv.cache.json";
 
 const JSONL_PATH = "../data/input.jsonl"
 
+const BM25_MIN_DOCS = 3;
+
 type EmbeddingCache = {
   rawtexts: string[];
   cleantexts: string[];
@@ -287,8 +289,20 @@ async function embedText(text: string): Promise<number[]> {
 }
 
 function buildBM25(texts: string[]) {
-  logger.info("Building BM25 index (%s docs)...", texts.length);
+  let paddedTexts = texts;
 
+  if (texts.length < BM25_MIN_DOCS) {
+    const needed = BM25_MIN_DOCS - texts.length;
+    logger.error(
+      "Corpus too small for BM25 (%s docs, need %s+), padding with %s dummy doc(s)",
+      texts.length,
+      BM25_MIN_DOCS,
+      needed
+    );
+    paddedTexts = [...texts, ...Array(needed).fill("placeholder dummy document")];
+  }
+
+  logger.info("Building BM25 index (%s docs)...", paddedTexts.length);
   const bm25 = bm25Factory();
 
   bm25.defineConfig({
@@ -302,7 +316,7 @@ function buildBM25(texts: string[]) {
     nlp.tokens.removeWords,
   ]);
 
-  texts.forEach((text, i) => {
+  paddedTexts.forEach((text, i) => {
     bm25.addDoc({ text }, i);
   });
 

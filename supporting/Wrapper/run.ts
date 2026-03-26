@@ -118,7 +118,7 @@ async function processRecord(record: any): Promise<ResultRecord> {
       input: buildAgentInput(record),
       streamMode: "values",
       config: {
-        recursion_limit: 50
+        recursion_limit: 100
       }
     });
 
