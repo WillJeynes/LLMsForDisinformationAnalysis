@@ -1,8 +1,7 @@
 import { GraphNode } from "@langchain/langgraph";
 import { MessagesState, ProposedTriggerEventArray } from "../state";
 import { logger } from "../utils/logger";
-import { queryScraper } from "../tools/webSearch";
-import { rankAndDisplayData } from "../tools/triggerEventTools";
+import { jsonrepair } from 'jsonrepair'
 
 export const verificationSetup: GraphNode<typeof MessagesState> = async (state) => {
   //this is kinda doing two things, but having two nodes for it seems overkill
@@ -11,7 +10,10 @@ export const verificationSetup: GraphNode<typeof MessagesState> = async (state) 
     logger.warn("No trigger events in memory, parsing")
 
     let genResponse = state.messages.at(-1)?.content.toString() ?? "";
-    const parsed = ProposedTriggerEventArray.parse(JSON.parse(genResponse));
+
+    const repaired = jsonrepair(genResponse);
+
+    const parsed = ProposedTriggerEventArray.parse(JSON.parse(repaired));
 
     for (let i = 0; i < parsed.length; i++) {
       const search = parsed[i].SearchQuery
