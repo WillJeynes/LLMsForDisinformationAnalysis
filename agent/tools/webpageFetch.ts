@@ -8,7 +8,7 @@ export async function extractWebpageContent(url: string): Promise<string[]> {
     const response = await backOff(async () => {
       return await extractWebpageContentWorker(url);
     }, {
-      numOfAttempts: 10,
+      numOfAttempts: 5,
       startingDelay: 500,
       timeMultiple: 2,
       jitter: "full",
