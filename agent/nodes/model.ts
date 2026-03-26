@@ -9,7 +9,7 @@ export function createModelNode(tools: any, promptPath: string): GraphNode<typeo
         const sysPrompt = await hydratePrompt(promptPath, state);
 
         const model = new ChatOpenAI({
-            model: "gpt-5-mini"
+            model: "gpt-5.4-mini"
         });
         const modelWithTools = model.bindTools(Object.values(tools));
 
