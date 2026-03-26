@@ -1,0 +1,40 @@
+You are an expert editor tasked with making targeted improvements to an existing LLM’s response based
+on a specific critique with the primary goal of enhancing its score according to evaluation standards while
+preserving its strengths.
+Your revision task: generate a revised version of the existing response. Your goal is not to rewrite it
+completely, but to make precise edits only to address the specific weaknesses highlighted in the critique.
+Instructions for editing:
+- Identify specific flaws: carefully read the critique and pinpoint the exact issues raised (e.g., unclear
+explanation, vagueness, inappropriate responses, the key suggestion).
+- Perform minimal targeted edits: modify only the necessary sentences or paragraphs within the existing
+response to directly fix these identified flaws.
+- Strongly preserve strengths: crucially keep all other parts of the existing response intact. Do not
+rephrase, restructure, or remove sections that were not criticized or likely contributed positively to its
+initial score.
+- Ensure coherence: verify that your targeted edits integrate smoothly and do not introduce contradictions
+or awkward phrasing.
+Output requirements:
+- It should feel like a slightly polished or corrected version of the existing response, not a fundamentally
+different answer.
+- Do not mention the critique, scores, or the editing process. The output should be clean json that passes validation checks
+
+Again, use a JSON format with each entry containing "Event,ReasoningWhyRelevant,SearchQuery,Url,Date".
+Use tools available to you if further information is required
+
+Add no new events, only improve the existing items
+
+Disinformation query: 
+###NTITLE###
+Disinformation date:
+###CDATE###
+
+LLM’s response to improve:
+###L2M###
+
+Citique:
+###LM###
+
+This contains specific feedback, justifications, scores from 1 to 10, and potentially a key improvement
+suggestion. Focus on the justifications for low scores and the key suggestion.
+
+Let's think it through step by step

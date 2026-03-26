@@ -11,13 +11,18 @@ import { loopEndConditional } from "./conditionals/loop_end";
 import { sort } from "./nodes/sort";
 import { triggerEventSetup } from "./nodes/triggerEventSetup";
 import { createEnsembleNode } from "./nodes/ensembleNode";
+import { selfEvalSetup } from "./nodes/selfEvalSetup";
 
 const triggerEventToolNode = createToolNode(triggerEventToolsByName);
+const peToolNode = createToolNode(triggerEventToolsByName);
 
 const normalisationModel = createModelNode([], "normalization.txt");
 const triggerEventModel = createModelNode(triggerEventToolsByName, "trigger.txt");
+const evaluationModel = createModelNode([], "eval.txt");
+const peModel = createModelNode(triggerEventToolsByName, "posteval.txt");
 
-const triggerEventToolConditional = createToolConditional("triggerEventToolNode", verificationSetup.name);
+const triggerEventToolConditional = createToolConditional("triggerEventToolNode", selfEvalSetup.name);
+const peToolConditional = createToolConditional("peToolNode", verificationSetup.name);
 
 const roNode = createEnsembleNode("ROBERTA", "roberta");
 const flNode = createEnsembleNode("FLAN", "flan");
@@ -32,6 +37,12 @@ const agent = new StateGraph(MessagesState)
   .addNode(triggerEventSetup.name, triggerEventSetup)
   .addNode("triggerEventToolNode", triggerEventToolNode)
   .addNode("triggerEventModel", triggerEventModel)
+
+  .addNode(selfEvalSetup.name, selfEvalSetup)
+  .addNode("evaluationModel", evaluationModel)
+  
+  .addNode("peToolNode", peToolNode)
+  .addNode("peModel", peModel)
 
   .addNode(verificationSetup.name, verificationSetup)
 
@@ -49,8 +60,15 @@ const agent = new StateGraph(MessagesState)
   .addEdge(triggerEventSetup.name, "triggerEventModel")
   
   // @ts-expect-error
-  .addConditionalEdges("triggerEventModel", triggerEventToolConditional, ["triggerEventToolNode", verificationSetup.name])
+  .addConditionalEdges("triggerEventModel", triggerEventToolConditional, ["triggerEventToolNode", selfEvalSetup.name])
   .addEdge("triggerEventToolNode", "triggerEventModel")
+  
+  .addEdge(selfEvalSetup.name, "evaluationModel")
+  .addEdge("evaluationModel", "peModel")
+
+  // @ts-expect-error
+  .addConditionalEdges("peModel", peToolConditional, ["peToolNode", verificationSetup.name])
+  .addEdge("peToolNode", "peModel")
   
   .addEdge(verificationSetup.name, "roNode")
   .addEdge(verificationSetup.name, "flNode")

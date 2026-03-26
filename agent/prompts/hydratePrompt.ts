@@ -15,6 +15,10 @@ export async function hydratePrompt(path: string, state: any) : Promise<string> 
         raw = raw.replace("###LM###", state.messages.at(-1).content);
     }
 
+    if (raw.indexOf("###L2M###") != -1) {
+        raw = raw.replace("###L2M###", state.messages.at(-2).content);
+    }
+
     if (raw.indexOf("###NTITLE###") != -1) {
         raw = raw.replace("###NTITLE###", state.normalizedClaim);
     }
@@ -31,6 +35,13 @@ export async function hydratePrompt(path: string, state: any) : Promise<string> 
     if (raw.indexOf("###TESEARCH###") != -1) {
         const output = state.proposedTriggerEvent[state.proposedTriggerEventIndex].context
         raw = raw.replace("###TESEARCH###", output)
+    }
+
+    if (raw.indexOf("###VESEARCHES###") != -1) {
+        const output = state.evalTriggerEvent
+            .map(e => e.context)
+            .join("\n")
+        raw = raw.replace("###VESEARCHES###", output)
     }
 
     return raw;

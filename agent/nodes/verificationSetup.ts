@@ -13,15 +13,6 @@ export const verificationSetup: GraphNode<typeof MessagesState> = async (state) 
     let genResponse = state.messages.at(-1)?.content.toString() ?? "";
     const parsed = ProposedTriggerEventArray.parse(JSON.parse(genResponse));
 
-    for (let i = 0; i < parsed.length; i++) {
-      const search = parsed[i].SearchQuery
-      // const data = await queryScraper(search);
-      // const output = await rankAndDisplayData(data, search);
-
-      // parsed[i].context = output;
-      parsed[i].context = "NONE"
-    }
-    
     return { proposedTriggerEvent: parsed, proposedTriggerEventIndex: 0 };
   }
   else {

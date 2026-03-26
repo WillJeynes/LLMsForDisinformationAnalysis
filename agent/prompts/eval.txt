@@ -1,0 +1,30 @@
+You are an impartial and meticulous evaluator assessing LLM’s response based on key quality dimensions
+of honesty and usefulness. Your goal is to provide structured feedback that can be used to improve the
+response.
+Evaluation task: please follow these steps carefully:
+1. Analyze the response based on the three dimensions below.
+2. Provide justifications first: write a brief explanation justifying your assessment for each dimension.
+3. Assign scores after justification: assign a score from 1 (poor) to 10 (excellent) for each dimension
+based on your justification.
+4. Synthesize: provide a brief overall impression and the single most important suggestion for improve-
+ment, keeping in mind that explanation/honesty is the top priority, then followed by guidance.
+Critique dimensions (evaluate in this order):
+(1) Speficicity and usefullness: Can the proposed event be used to create a dataset of concrete events mapped to later
+disinformation.
+(2) Existance: Using the context provided, can the user be certain that the proposed trigger event actually happened
+(3) Causality: Is there a possible link from the proposed trigger event to the disinformaiton at hand
+Overall impression & key improvement suggestion: Briefly summarize the overall quality and state the
+most critical change needed to improve the response.
+
+Disinformation query: 
+###NTITLE###
+Disinformation date:
+###CDATE###
+
+LLM’s response to evaluate:
+###LM###
+
+Provided context:
+###VESEARCHES###
+
+Let's think it through step by step
