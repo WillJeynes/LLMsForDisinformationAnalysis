@@ -1,8 +1,7 @@
 import { GraphNode } from "@langchain/langgraph";
 import { MessagesState, ProposedTriggerEventArray } from "../state";
 import { logger } from "../utils/logger";
-import { queryScraper } from "../tools/webSearch";
-import { rankAndDisplayData } from "../tools/triggerEventTools";
+import { jsonrepair } from 'jsonrepair'
 
 export const verificationSetup: GraphNode<typeof MessagesState> = async (state) => {
   //this is kinda doing two things, but having two nodes for it seems overkill
@@ -11,15 +10,29 @@ export const verificationSetup: GraphNode<typeof MessagesState> = async (state) 
     logger.warn("No trigger events in memory, parsing")
 
     let genResponse = state.messages.at(-1)?.content.toString() ?? "";
-    const parsed = ProposedTriggerEventArray.parse(JSON.parse(genResponse));
 
-    for (let i = 0; i < parsed.length; i++) {
-      const search = parsed[i].SearchQuery
-      // const data = await queryScraper(search);
-      // const output = await rankAndDisplayData(data, search);
+    const repaired = jsonrepair(genResponse);
 
-      // parsed[i].context = output;
-      parsed[i].context = "NONE"
+    let parsed;
+
+    try {
+      const json = JSON.parse(repaired);
+
+      if (Array.isArray(json)) {
+        parsed = ProposedTriggerEventArray.parse(json);
+      } else {
+        // try grab first value
+        const firstValue = Object.values(json)[0];
+
+        if (Array.isArray(firstValue)) {
+          parsed = ProposedTriggerEventArray.parse(firstValue);
+        } else {
+          throw new Error("No array found in JSON");
+        }
+      }
+    } catch (err: any) {
+      logger.error(`Failed to parse LLM response: ${err.message}`);
+      throw new Error(`Failed to parse LLM response: ${err}`);
     }
     
     return { proposedTriggerEvent: parsed, proposedTriggerEventIndex: 0 };
