@@ -92,7 +92,7 @@ LABEL_TO_INT = {v: k for k, v in INT_TO_LABEL.items()}
 flan_tokenizer = AutoTokenizer.from_pretrained(FLAN_PATH)
 flan_model = AutoModelForSeq2SeqLM.from_pretrained(FLAN_PATH)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 flan_model.to(device)
 flan_model.eval()
 
