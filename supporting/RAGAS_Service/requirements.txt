@@ -9,6 +9,7 @@ datasets
 # ROBERTA
 scikit-learn
 transformers[torch]
+sentence_transformers
 
 # Utils
 numpy
