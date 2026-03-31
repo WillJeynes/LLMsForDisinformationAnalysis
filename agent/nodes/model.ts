@@ -9,7 +9,7 @@ export function createModelNode(tools: any, promptPath: string): GraphNode<typeo
         const sysPrompt = await hydratePrompt(promptPath, state);
 
         const model = new ChatOllama({
-            model: "deepseek-r1:14b",
+            model: "qwen3.5:9b",
             temperature: 0.7,
         });
 
