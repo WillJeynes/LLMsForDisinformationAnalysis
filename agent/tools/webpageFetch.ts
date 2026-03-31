@@ -26,6 +26,9 @@ async function extractWebpageContentWorker(url: string): Promise<string[]> {
   try {
     const options = new firefox.Options();
     options.addArguments("--headless");
+    options.addArguments("--disable-gpu");
+    options.addArguments("--no-sandbox"); // Linux sandbox issues
+    options.addArguments("--disable-dev-shm-usage"); // /dev/shm issues
     driver = await new Builder()
       .forBrowser(Browser.FIREFOX)
       .setFirefoxOptions(options)
