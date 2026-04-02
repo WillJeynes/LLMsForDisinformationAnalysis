@@ -3,13 +3,14 @@ import { GraphNode } from "@langchain/langgraph";
 import { MessagesState } from "../state";
 import { ChatOllama } from "@langchain/ollama";
 import { hydratePrompt } from "../prompts/hydratePrompt";
+import { logger } from "../utils/logger";
 
 export function createModelNode(tools: any, promptPath: string): GraphNode<typeof MessagesState> {
     return async (state) => {
         const sysPrompt = await hydratePrompt(promptPath, state);
 
         const model = new ChatOllama({
-            model: "qwen3.5:9b",
+            model: "llama3.1:8b-instruct-fp16",
             temperature: 0.7,
         });
 
@@ -19,6 +20,8 @@ export function createModelNode(tools: any, promptPath: string): GraphNode<typeo
             new SystemMessage(sysPrompt),
             ...state.messages,
         ]);
+
+        logger.error(response);
 
         return {
             messages: [response]
