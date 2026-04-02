@@ -16,4 +16,7 @@ Relevent examples are included in preceeding messages, use these as exact inspir
 The claim to normalize is:
 ###TITLE###
 
-Produce no other text other than the condensed claim in inverted commas. Nothing should be around the normalised claim.
+Produce no other text other than the condensed claim, surrounded <norm></norm>
+
+For example: BREAKING: the sky is green!
+Becomes: <norm>The sky is green</norm>

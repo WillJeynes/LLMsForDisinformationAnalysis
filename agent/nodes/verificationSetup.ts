@@ -3,6 +3,12 @@ import { MessagesState, ProposedTriggerEventArray } from "../state";
 import { logger } from "../utils/logger";
 import { jsonrepair } from 'jsonrepair';
 
+function extractJSON(text: string) {
+  const match = text.match(/<json>([\s\S]*?)<\/json>/);
+  if (!match) throw new Error("No JSON found between <json> tags");
+  return match[1].trim();
+}
+
 export const verificationSetup: GraphNode<typeof MessagesState> = async (state) => {
   if (state.proposedTriggerEvent == undefined) {
     logger.warn("No trigger events in memory, parsing");
@@ -11,7 +17,8 @@ export const verificationSetup: GraphNode<typeof MessagesState> = async (state) 
 
     let repaired: string;
     try {
-      repaired = jsonrepair(genResponse);
+      let extracted = extractJSON(genResponse)
+      repaired = jsonrepair(extracted);
     } catch (repairErr: any) {
       logger.error("Failed to repair JSON from LLM response.");
       logger.error("Original LLM response:\n%s", genResponse);
