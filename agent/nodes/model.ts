@@ -10,8 +10,8 @@ export function createModelNode(tools: any, promptPath: string): GraphNode<typeo
         const sysPrompt = await hydratePrompt(promptPath, state);
 
         const model = new ChatOllama({
-            model: "llama3.1:8b-instruct-fp16",
-            temperature: 0.7,
+            model: "llama3.1:8b-instruct-q4_K_M",
+            temperature: 0.3
         });
 
         const modelWithTools = model.bindTools(Object.values(tools));
