@@ -1,4 +1,4 @@
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { SystemMessage } from "@langchain/core/messages";
 import { GraphNode } from "@langchain/langgraph";
 import { MessagesState } from "../state";
 import { ChatOllama } from "@langchain/ollama";

@@ -7,7 +7,7 @@ export async function evaluateWithEnsemble({
   answer: string;
   method: string
 }): Promise<{ validProb: number; invalidProb: number; }> {
-  const res = await axios.post("http://localhost:8000/evaluate", {
+    const res = await axios.post(process.env.RANKING_URL ?? "http://localhost:8000/evaluate", {
     answer,
     method
   }, {timeout: 0});
@@ -18,11 +18,15 @@ export async function evaluateWithEnsemble({
   return {validProb, invalidProb};
 }
 
-// let res = await evaluateWithRoberta({answer: "High-profile political downplaying of COVID-19 (examples: President Trump saying 'it will go away' in March–August 2020)"});
+// import dotenv from "dotenv";
+
+// dotenv.config();
+
+// let res = await evaluateWithEnsemble({method:"flan" ,answer: "High-profile political downplaying of COVID-19 (examples: President Trump saying 'it will go away' in March–August 2020)"});
 // console.log(res)
 
-// res = await evaluateWithRoberta({answer: "Multiple mirrored reuploads (2020–2023) put the clip on other channels with titles implying it was a genuine 1970s public information film."});
+// res = await evaluateWithEnsemble({method:"roberta" ,answer: "Multiple mirrored reuploads (2020–2023) put the clip on other channels with titles implying it was a genuine 1970s public information film."});
 // console.log(res)
 
-// res = await evaluateWithRoberta({answer: "The COVID-19 Pandemic"});
+// res = await evaluateWithEnsemble({method:"logreg" ,answer: "The COVID-19 Pandemic"});
 // console.log(res)
