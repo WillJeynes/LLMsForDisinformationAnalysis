@@ -4,8 +4,7 @@ from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.common.exceptions import WebDriverException, TimeoutException
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.common.exceptions import WebDriverException, TimeoutException, StaleElementReferenceException
 from tqdm import tqdm
 
 def init_driver():
@@ -32,9 +31,15 @@ def is_root_url(url):
     return parsed.path in ("", "/")
 
 def is_404_page(driver):
-    title = driver.title.lower()
-    body_text = driver.find_element("tag name", "body").text.lower()
-    return "404" in title or "404" in body_text
+    """Safely check for 404, handling stale elements."""
+    try:
+        title = driver.title.lower()
+        body_text = driver.find_element("tag name", "body").text.lower()
+        return "404" in title or "404" in body_text
+    except StaleElementReferenceException:
+        return False
+    except Exception:
+        return False
 
 def check_url_selenium(url):
     driver = None
@@ -43,34 +48,35 @@ def check_url_selenium(url):
         driver.get(url)
         # 404 check
         if is_404_page(driver):
-            print("404")
-            return False
+            return False, "404 page detected"
         # Root URL after redirects
         final_url = driver.current_url
         if is_root_url(final_url):
-            print("ROOT")
-            return False
-        return True
+            return False, f"Redirected to root URL ({final_url})"
+        return True, None
     except (WebDriverException, TimeoutException) as e:
-        print(e)
-        return False
+        return False, str(e)
     finally:
         if driver:
             driver.quit()
 
 def process_event(event):
+    """Process an event only if score > 0.4."""
+    score = event.get("score", 0)
+    if score <= 0.4:
+        return None, False, "Score too low"
     url = event.get("Url")
     if not url:
-        return None, False
-    is_valid = check_url_selenium(url)
+        return None, False, "No URL"
+    is_valid, error_msg = check_url_selenium(url)
     event["url_valid"] = is_valid
-    return url, is_valid
+    return url, is_valid, error_msg
 
 def process_jsonl_file(file_path, max_workers=4):
     invalid_urls = []
     valid_urls = 0
 
-    # Gather all events to process
+    # Gather events with score > 0.4
     urls_to_check = []
     with open(file_path, "r", encoding="utf-8") as f:
         for line in f:
@@ -78,7 +84,8 @@ def process_jsonl_file(file_path, max_workers=4):
             if line_data.get("status") != "success":
                 continue
             for event in line_data.get("events", []):
-                urls_to_check.append(event)
+                if event.get("score", 0) > 0.4:
+                    urls_to_check.append(event)
 
     total_urls = len(urls_to_check)
 
@@ -86,21 +93,22 @@ def process_jsonl_file(file_path, max_workers=4):
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_event = {executor.submit(process_event, e): e for e in urls_to_check}
         for future in tqdm(as_completed(future_to_event), total=total_urls, desc="Checking URLs"):
-            url, is_valid = future.result()
+            url, is_valid, error_msg = future.result()
             if not is_valid and url:
-                invalid_urls.append(url)
+                invalid_urls.append((url, error_msg))
             else:
                 valid_urls += 1
 
     # Summary
+    if invalid_urls:
+        print("\nList of invalid URLs and reasons:")
+        for url, err in invalid_urls:
+            print(f"{url} --> {err}")
     print("\n=== URL Validation Summary ===")
     print(f"Total URLs processed: {total_urls}")
     print(f"Valid URLs (loaded successfully): {valid_urls}")
     print(f"Invalid URLs: {len(invalid_urls)}")
-    if invalid_urls:
-        print("\nList of invalid URLs:")
-        for url in invalid_urls:
-            print(url)
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Validate URLs in JSONL file events using Selenium")

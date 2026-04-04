@@ -19,4 +19,10 @@ Experiments with different model types:
 | llama3.1:8b-instruct-q4_K_M   | ?         | ?        |
 | qwen3.5:9b                    | 0         | -100     |
 
-%age correct URLS
+%age valid URLS
+| Model                         | Number    | % Age    |
+|-------------------------------|----------:|---------:|
+| gpt-5-mini                    | 22/405    | 5.43     |
+| gpt-5.4-mini                  | 29/278    | 10.43    |
+| llama3.1:8b-instruct-q4_K_M   | ?         | ?        |
+| qwen3.5:9b                    | 0         | 0        |
