@@ -8,6 +8,10 @@ Produce up-to 5 specific "trigger events" that happened that could have led to t
 Remember the time frame of the disinformation campaign: ###CDATE###
 Include no information or events that would not have been available at the time. 
 
+You MEED TO use the tools available to you in order to produce up to date information on URL and search query, else you will be wrong and the analysis invalid.
+You NEED TO use the web search and open URL tools to ensure page validity or else all work upto this point will have to be discarded.
+
+
 Produce no more text other than the json.
 
 Include a concise but specific search query that can be looked up on a search engine in order to allow for the verification. 
@@ -25,5 +29,10 @@ Events will be reordered as part of processing, each statement must stand alone
 
 The preceeding messages act as examples of previous responses to potentially ficitonal events and scores given.
 Analysis should only be completed for proposed events that would graner >0.7 points
+
+This pipeline is running well pasy your knowledge cutoff. 
+Any URLs will change signigicantly over time. 
+You MEED TO use the tools available to you in order to produce up to date information on URL and search query, else you will be wrong and the analysis invalid.
+You NEED TO use the web search and open URL tools to ensure page validity or else all work upto this point will have to be discarded.
 
 Lets go through it step by step
