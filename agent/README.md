@@ -14,10 +14,13 @@ Experiments modifying pipeline
 Experiments with different model types:
 | Model                         | % Correct | % Change |
 |-------------------------------|----------:|---------:|
-| gpt-5-mini                    | 33        | 0        |
-| gpt-5.4-mini                  | 32.4      | -0.02    |
-| llama3.1:8b-instruct-q4_K_M   | ?         | ?        |
-| qwen3.5:9b                    | 0         | -100     |
+| gpt-5-mini                    | 45.51     |          |
+| gpt-5.4-mini                  | 32.4      |          |
+| gpt-5.4-nano                  | 23.28     |          |
+| gpt-4.1-mini                  | 27.85     |          |
+| gpt-4o-mini                   | 32.47     |          |
+| llama3.1:8b-instruct-q4_K_M   | ?         |          |
+| qwen3.5:9b                    | 0         |          |
 
 %age valid URLS
 | Model                         | Number    | % Age    |
