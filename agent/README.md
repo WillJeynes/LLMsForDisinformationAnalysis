@@ -30,4 +30,3 @@ Experiments with different model types:
 | gpt-5.4-nano                  | 6/210     | 2.85     |
 | gpt-4.1-mini                  | 15/269    | 5.57     |
 | gpt-4o-mini                   | 27/287    | 9.407    |
-| llama3.1:8b-instruct-q4_K_M   | ?         | ?        |

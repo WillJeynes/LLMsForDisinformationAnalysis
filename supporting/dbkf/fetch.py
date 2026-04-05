@@ -27,7 +27,7 @@ DEFAULT_PARAMS = [
     ("organization", "http://weverify.eu/resource/Organization/3727f7b2aa90ec0716693e5464b28d18"), # StopFake
 ]
 
-NUM_RANDOM_CLAIMS = 200
+NUM_RANDOM_CLAIMS = 2000
 
 INPUT_FILE = "../../data/input.jsonl"
 OUTPUT_FILE = "../../data/claims.json"

@@ -19,6 +19,9 @@ const MODE = process.env.MODE ?? "claim";
 
 const MAX_CONCURRENCY = 5;
 
+const OFFSET = parseInt(process.env.OFFSET ?? "0", 10);
+const LIMIT = process.env.LIMIT ? parseInt(process.env.LIMIT, 10) : null;
+
 const client = new Client({ apiUrl: API_URL });
 
 
@@ -164,10 +167,19 @@ async function processRecord(record: any): Promise<ResultRecord> {
 async function main() {
   console.log("Reading input file...");
 
-  const records = await loadInputs();
+  const allRecords = await loadInputs();
 
-  console.log(`Loaded ${records.length} records`);
+  console.log(`Loaded ${allRecords.length} records`);
 
+  const records = allRecords.slice(
+    OFFSET,
+    LIMIT !== null ? OFFSET + LIMIT : undefined
+  );
+
+  console.log(
+    `Processing ${records.length} records (offset=${OFFSET}, limit=${LIMIT ?? "∞"})`
+  );
+  
   fs.writeFileSync(OUTPUT_FILE, "", { flag: "a" });
 
   const limit = pLimit(MAX_CONCURRENCY);
