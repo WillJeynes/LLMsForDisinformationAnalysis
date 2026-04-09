@@ -14,7 +14,9 @@ Final Dissertation Submission Repository
 [See agent](/agent/)
 
 ## Generated Database Link and Usage Experiments
--- todo --
+Generated Dataset Link: [https://huggingface.co/datasets/WillJeynes/LLMsForDisinformationAnalysis-Dataset](https://huggingface.co/datasets/WillJeynes/LLMsForDisinformationAnalysis-Dataset)
+
+Usage Experiments Link: [https://github.com/WillJeynes/LLMsForDisinformationPrediction](https://github.com/WillJeynes/LLMsForDisinformationPrediction)
 
 ## Repository Structure
 ```
