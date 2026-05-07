@@ -1,8 +1,21 @@
 # AI models for identifying trigger events in disinformation analysis
 Final Dissertation Submission Repository
 
-## Project Description
+## Abstract
 -- todo --
+
+[Project Presentation](https://jillweynes.github.io/LLMsForDisinformationPrediction-GraphVizBuilt/presentation)
+
+## Generated Database Link and Usage Experiments
+Generated Dataset Link: [https://huggingface.co/datasets/WillJeynes/LLMsForDisinformationAnalysis-Dataset](https://huggingface.co/datasets/WillJeynes/LLMsForDisinformationAnalysis-Dataset)
+
+Graph-Based Dataset Visualisation: [https://jillweynes.github.io/LLMsForDisinformationPrediction-GraphVizBuilt/](https://jillweynes.github.io/LLMsForDisinformationPrediction-GraphVizBuilt/)
+
+Usage Experiments (incl graph visualisation) Source Code: [https://github.com/WillJeynes/LLMsForDisinformationPrediction](https://github.com/WillJeynes/LLMsForDisinformationPrediction)
+
+
+
+# This repository:
 
 ## Solution Diagram
 -- todo --
@@ -13,10 +26,6 @@ Final Dissertation Submission Repository
 ## Agent Refinement
 [See agent](/agent/)
 
-## Generated Database Link and Usage Experiments
-Generated Dataset Link: [https://huggingface.co/datasets/WillJeynes/LLMsForDisinformationAnalysis-Dataset](https://huggingface.co/datasets/WillJeynes/LLMsForDisinformationAnalysis-Dataset)
-
-Usage Experiments Link: [https://github.com/WillJeynes/LLMsForDisinformationPrediction](https://github.com/WillJeynes/LLMsForDisinformationPrediction)
 
 ## Repository Structure
 ```

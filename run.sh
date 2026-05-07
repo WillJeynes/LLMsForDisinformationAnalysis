@@ -5,7 +5,7 @@ set -e
 run_agent () {
     echo "Starting LangGraph agent..."
     cd agent
-    npx @langchain/langgraph-cli dev
+    npx @langchain/langgraph-cli@1.1.17 dev
 }
 
 run_ensemble_service () {
